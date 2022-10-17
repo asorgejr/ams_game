@@ -639,3 +639,7 @@ lint/tmp/
 # Android Profiling
 *.hprof
 
+
+# 3rd-party binaries
+ams_game/third_party/glfw/include
+ams_game/third_party/glfw/lib

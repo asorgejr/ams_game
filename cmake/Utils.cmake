@@ -56,6 +56,35 @@ function(rename_files)
   endforeach()
 endfunction()
 
+function(files_to_interface)
+  set(options)
+  set(oneValueArgs VAR SOURCE_DIR INSTALL_DIR)
+  set(multiValueArgs FILES)
+  cmake_parse_arguments(FTI "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  if(NOT FTI_SOURCE_DIR)
+    message(FATAL_ERROR "files_to_interface: SOURCE_DIR not specified")
+  endif()
+  if(NOT FTI_INSTALL_DIR)
+    message(FATAL_ERROR "files_to_interface: INSTALL_DIR not specified")
+  endif()
+  set(changed " ")
+  foreach(file ${FTI_FILES})
+    get_filename_component(dir ${file} DIRECTORY)
+    get_filename_component(name ${file} NAME)
+    # warn if file is not in source dir. String path replacement will not work if true.
+    string(FIND ${dir} ${FTI_SOURCE_DIR} index)
+    if(index EQUAL -1)
+      message(WARNING "files_to_interface: '${file}' is not in source dir '${FTI_SOURCE_DIR}'")
+    endif()
+    list(APPEND ${changed} $<BUILD_INTERFACE:${dir}/${name}>)
+    set(idir " ")
+
+    string(REPLACE ${FTI_SOURCE_DIR} ${FTI_INSTALL_DIR} idir ${dir})
+    list(APPEND ${changed} $<INSTALL_INTERFACE:${idir}/${name}>)
+  endforeach()
+  set(${FTI_VAR} ${${changed}} PARENT_SCOPE)
+endfunction()
+
 # Discover platform and system information and set variables
 # Options:
 #   UPPERCASE - If set, all values will be in uppercase

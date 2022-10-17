@@ -1,0 +1,9 @@
+[submodule "third_party/glfw"]
+	path = third_party/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "ams_core/third_party/gcem"]
+	path = ams_core/third_party/gcem
+	url = https://github.com/kthohr/gcem.git
+[submodule "ams_spatial/third_party/eigen"]
+	path = ams_spatial/third_party/eigen
+	url = https://gitlab.com/libeigen/eigen.git
