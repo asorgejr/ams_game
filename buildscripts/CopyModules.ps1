@@ -11,7 +11,7 @@ foreach ($header in $core_headers) {
     # replace 'include' with 'modules' in path
     $module_dir = $header_dir.Replace("include", "include/modules")
     # invoke python script to convert header to cppm
-    python "${script_dir}\CopyModules.py" --input "${header}" --dest "${module_dir}"
+    python "${script_dir}/CopyModules.py" --input "${header}" --dest "${module_dir}"
     echo "Processing '${header}'"
 }
 
@@ -22,7 +22,7 @@ foreach ($header in $spatial_headers) {
     # replace 'include' with 'modules' in path
     $module_dir = $header_dir.Replace("include", "include/modules")
     # invoke python script to convert header to cppm
-    python "${script_dir}\CopyModules.py" --input "${header}" --dest "${module_dir}"
+    python "${script_dir}/CopyModules.py" --input "${header}" --dest "${module_dir}"
     echo "Processing '${header}'"
 }
 
@@ -33,7 +33,7 @@ foreach ($header in $game_headers) {
     # replace 'include' with 'modules' in path
     $module_dir = $header_dir.Replace("include", "include/modules")
     # invoke python script to convert header to cppm
-    python "${script_dir}\CopyModules.py" --input "${header}" --dest "${module_dir}"
+    python "${script_dir}/CopyModules.py" --input "${header}" --dest "${module_dir}"
     echo "Processing '${header}'"
 }
 

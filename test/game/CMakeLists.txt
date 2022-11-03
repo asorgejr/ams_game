@@ -13,3 +13,8 @@ add_test_module(NAME test_game
 add_executable(test_gfx test_gfx.cpp)
 target_link_libraries(test_gfx PRIVATE ams::game)
 target_include_directories(test_gfx PRIVATE ${game_INCLUDE_DIR})
+
+add_executable(profile_Game profile_Game.cpp)
+target_link_libraries(profile_Game PRIVATE ams::game)
+target_include_directories(profile_Game PRIVATE ${game_INCLUDE_DIR})
+

@@ -16,6 +16,7 @@
  */
 
 #include <thread>
+#include <iostream>
 #ifndef AMS_MODULES
 #include "ams/game/Application.hpp"
 #include "ams/game/Scene.hpp"
