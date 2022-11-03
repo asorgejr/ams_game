@@ -14,7 +14,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
+module;
+#include "ams_spatial_export.hpp"
 export module ams.spatial.Matrix3;
 import <concepts>;
 import <stdexcept>;
@@ -45,7 +46,7 @@ struct Matrix4;
 /**
  * @brief a row-major 3x3 Matrix. Y is up, X is right, and Z is forward.
  */
-struct Matrix3 {
+struct AMS_SPATIAL_EXPORT Matrix3 {
 protected:
   Array<Array<decimal_t, 3>, 3> m{0};
 public:
@@ -206,8 +207,7 @@ public:
     *this = *this * m3;
     return *this;
   }
-
-
+  
   template<Vec3T V3T>
   constexpr friend Matrix3 operator*(const Matrix3& mat, const V3T& v) {
     // row-major operation. Y is up.
@@ -228,21 +228,31 @@ public:
     };
   }
 
+  /**
+   * @brief Get the row of the matrix
+   * @param i - row index
+   * @return Vec3<decimal_t> - row vector
+   */
   [[nodiscard]] constexpr Vec3<decimal_t> row(int i) const {
     return {m[i][0], m[i][1], m[i][2]};
   }
 
+  /**
+   * @brief Get the column of the matrix
+   * @param i - column index
+   * @return Vec3<decimal_t> - column vector
+   */
   [[nodiscard]] constexpr Vec3<decimal_t> col(int i) const {
     return {m[0][i], m[1][i], m[2][i]};
   }
 
   /**
-   * @brief transposes a matrix in place
+   * @brief transposes the matrix in place
    */
   constexpr void transpose();
 
   /**
-   * @brief transposes a Matrix3
+   * @brief transposes the matrix
    * @return the transposed matrix
    */
   [[nodiscard]] constexpr Matrix3 transposed() const;
@@ -250,17 +260,23 @@ public:
   [[nodiscard]] constexpr decimal_t determinant() const;
 
   /**
-   * @brief inverts a matrix in place
-   * @return 
+   * @brief inverts the matrix in place
+   * @return true if the matrix was inverted
    */
   constexpr bool invert();
 
   /**
-   * @brief inverts a Matrix3
-   * @return the inverted matrix
+   * @brief Inverts the matrix
+   * @return the inverse of the matrix
    */
   [[nodiscard]] constexpr Matrix3 inverted() const;
   
+  /**
+   * @brief Scales the matrix
+   * @param x - x scale
+   * @param y - y scale
+   * @param z - z scale
+   */
   constexpr void scale(decimal_t x, decimal_t y, decimal_t z) {
     // row-major operation. Y is up.
     m[0][0] *= x;
@@ -274,14 +290,26 @@ public:
     m[2][2] *= z;
   }
   
+  /**
+   * @brief Scales the matrix
+   * @param v - scale vector
+   */
   constexpr void scale(const Vec3<decimal_t>& v) {
     scale(v.x, v.y, v.z);
   }
   
+  /**
+   * @brief Scales the matrix
+   * @param s - uniform scale
+   */
   constexpr void scale(decimal_t s) {
     scale(s, s, s);
   }
 
+  /**
+   * @brief rotate the x-axis of the matrix
+   * @param angle - angle in radians
+   */
   constexpr void rotatex(decimal_t angle) {
     // row-major operation. Y is up.
     decimal_t s = sin(angle);
@@ -300,6 +328,10 @@ public:
     m[2][2] = m2 * c - m1 * s;
   }
 
+  /**
+   * @brief rotate the y-axis of the matrix
+   * @param angle - angle in radians
+   */
   constexpr void rotatey(decimal_t angle) {
     // row-major operation. Y is up.
     decimal_t s = sin(angle);
@@ -318,6 +350,10 @@ public:
     m[2][2] = m2 * c + m0 * s;
   }
 
+  /**
+   * @brief rotate the z-axis of the matrix
+   * @param angle - angle in radians
+   */
   constexpr void rotatez(decimal_t angle) {
     // row-major operation. Y is up, Z is forward.
     decimal_t s = sin(angle);
@@ -336,6 +372,13 @@ public:
     m[1][2] = m1 * c - m0 * s;
   }
 
+  /**
+   * @brief rotate the matrix around an arbitrary axis
+   * @param axis_x - x component of the axis
+   * @param axis_y - y component of the axis
+   * @param axis_z - z component of the axis
+   * @param angle - angle in radians
+   */
   constexpr void rotate(decimal_t axis_x, decimal_t axis_y, decimal_t axis_z, decimal_t angle) {
     // row-major operation. X is right, Y is up, Z is forward. 
     decimal_t s = sin(angle);
@@ -369,18 +412,54 @@ public:
     m[1][2] = m6 * t1 + m7 * t4 + m8 * t7;
   }
 
+  /**
+   * @brief rotate the matrix around an arbitrary axis
+   * @param axis - axis
+   * @param angle - angle in radians
+   */
   constexpr void rotate(const Vec3 <decimal_t>& axis, decimal_t angle) {
     this->rotate(axis.x, axis.y, axis.z, angle);
   }
   
+  /**
+   * @brief rotate the matrix using a quaternion
+   * @param q - quaternion
+   */
   constexpr void rotate(const Quaternion& q) {
     *this *= Matrix3(q);
   }
+  
+  /**
+   * @brief euler angles of the matrix
+   * @return euler angles
+   */
+  [[nodiscard]] constexpr Vec3<decimal_t> eulerangles() const {
+    // row-major operation. X is right, Y is up, Z is forward.
+    decimal_t x = atan2(m[1][2], m[2][2]);
+    decimal_t y = atan2(-m[0][2], sqrt(m[1][2] * m[1][2] + m[2][2] * m[2][2]));
+    decimal_t z = atan2(m[0][1], m[0][0]);
+    return {x, y, z};
+  }
+  
+  /**
+   * @brief quaternion representation of the rotation matrix
+   * @return quaternion
+   */
+  [[nodiscard]] constexpr Quaternion quaternion() const;
 
+  /**
+   * @brief Default identity matrix.
+   */
   [[nodiscard]] constexpr static Matrix3 identity() {
     return {1, 0, 0, 0, 1, 0, 0, 0, 1};
   }
   
+  /**
+   * @brief Creates a rotation matrix from a forward vector and an up vector.
+   * @param forward - The forward vector.
+   * @param up - The up vector.
+   * @return The rotation matrix.
+   */
   [[nodiscard]] static constexpr Matrix3 fromaxes(const Vec3<decimal_t>& forward, const Vec3<decimal_t>& up) {
     Vec3<decimal_t> right = cross(forward, up);
     return {right.x, right.y, right.z, up.x, up.y, up.z, forward.x, forward.y, forward.z};
@@ -389,7 +468,6 @@ public:
 
   friend Matrix2;
   friend Matrix4;
-  //
 };
 
 } // ams

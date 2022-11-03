@@ -17,6 +17,7 @@
 export module ams.Math;
 import <cmath>;
 import <type_traits>;
+import <algorithm>;
 import <stdexcept>;
 import <gcem.hpp>;
 import ams.config;
@@ -676,7 +677,7 @@ template<NumericT TNum>
  */
 template<DecimalT TNum>
 [[nodiscard]] constexpr bool is_naught(TNum value, TNum epsilon = std::numeric_limits<TNum>::epsilon()) {
-  return std::abs(value) < epsilon;
+  return abs(value) < epsilon;
 }
 
 /**
@@ -690,7 +691,7 @@ template<DecimalT TNum>
  */
 template<DecimalT TNum>
 [[nodiscard]] constexpr bool is_equal(TNum a, TNum b, TNum epsilon = std::numeric_limits<TNum>::epsilon()) {
-  return std::abs(a - b) < epsilon;
+  return abs(a - b) < epsilon;
 }
 
 template<NumericT TNum1, NumericT TNum2>

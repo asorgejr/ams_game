@@ -15,19 +15,44 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/*[export module ams.game.Component]*/
 /*[exclude begin]*/
 #pragma once
+#include "ams_game_export.hpp"
 #include "Object.hpp"
 /*[exclude end]*/
-/*[export module ams.Component]*/
-/*[import ams.Object]*/
+/*[import ams.game.Object]*/
 
-namespace ams {
+/*[export]*/ namespace ams {
 
-class Component : public Object {
+class Entity;
+
+/**
+ * @brief The Component class is the base class for all components.
+ * @details Components are the building blocks of a ams::Entity. They are used to add core 
+ * functionality to a ams::Entity. The lifetime of a component is tied to the lifetime of the ams::Entity
+ * it is attached to. When the ams::Entity is destroyed, all of its components are destroyed.
+ * Components are attached to a ams::Entity using ams::Entity::addComponent().
+ * Components do not have any event handlers and as such they can not be used for behavioral scripting. For
+ * scripting, use ams::Behavior.
+ */
+class AMS_GAME_EXPORT Component : public Object {
+protected:
+  Entity* entity = nullptr;
 public:
-    Component() = default;
+    explicit Component(Entity* entity) : entity(entity) {}
     virtual ~Component() = default;
+    
+    Component(const Component& other) = delete;
+    Component(Component&& other) noexcept = delete;
+    Component& operator=(const Component& other) = delete;
+    Component& operator=(Component&& other) noexcept = delete;
+    
+    /**
+     * @brief Returns the ams::Entity this component is attached to.
+     * @return The ams::Entity this component is attached to.
+     */
+    [[nodiscard]] Entity* getEntity() const { return entity; }
 };
 
 } // ams

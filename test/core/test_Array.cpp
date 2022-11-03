@@ -171,4 +171,36 @@ TEST(array, ArrayOutOfBoundsBackConst) {
   EXPECT_THROW(arr.back(), std::out_of_range);
 }
 
+TEST(array, ArraySlice) {
+  ams::Array<int, 7> arr{1, 2, 3, 4, 5, 6, 7};
+  auto slice = arr.slice(1, 5);
+  auto size = slice.size();
+  EXPECT_EQ(size, 4);
+  EXPECT_EQ(slice[0], 2);
+  EXPECT_EQ(slice[1], 3);
+  EXPECT_EQ(slice[2], 4);
+  EXPECT_EQ(slice[3], 5);
+}
+
+TEST(array, ArraySliceConst) {
+  const ams::Array<int, 7> arr{1, 2, 3, 4, 5, 6, 7};
+  auto slice = arr.slice(1, 5);
+  auto size = slice.size();
+  EXPECT_EQ(size, 4);
+  EXPECT_EQ(slice[0], 2);
+  EXPECT_EQ(slice[1], 3);
+  EXPECT_EQ(slice[2], 4);
+  EXPECT_EQ(slice[3], 5);
+}
+
+TEST(array, ArraySliceOutOfBounds) {
+  ams::Array<int, 7> arr{1, 2, 3, 4, 5, 6, 7};
+  EXPECT_THROW(arr.slice(1, 8), std::out_of_range);
+}
+
+TEST(array, ArraySliceOutOfBoundsConst) {
+  const ams::Array<int, 7> arr{1, 2, 3, 4, 5, 6, 7};
+  EXPECT_THROW(arr.slice(1, 8), std::out_of_range);
+}
+
 #endif

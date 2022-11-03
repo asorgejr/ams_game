@@ -19,6 +19,18 @@
 /*[exclude begin]*/
 #pragma once
 #include "game/Platform.hpp"
+#include "game/Entity.hpp"
+#include "game/Transform.hpp"
+#include "game/Behavior.hpp"
+#include "game/Camera.hpp"
+#include "game/Scene.hpp"
+#include "game/Application.hpp"
 /*[exclude end]*/
 /*[export module ams.spatial]*/
-/*[import ams.game.Platform]*/
+/*[export import ams.game.Platform]*/
+/*[export import ams.game.Entity]*/
+/*[export import ams.game.Transform]*/
+/*[export import ams.game.Behavior]*/
+/*[export import ams.game.Camera]*/
+/*[export import ams.game.Scene]*/
+/*[export import ams.game.Application]*/

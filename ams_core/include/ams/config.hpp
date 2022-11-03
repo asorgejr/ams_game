@@ -14,22 +14,30 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/*[export module ams.config]*/
+/*[exclude begin]*/
+#pragma once
+/*[exclude end]*/
 
-export module ams.GameObject;
-import ams.Object;
+/*[export]*/ namespace ams {
 
-
-namespace ams {
-
-class GameObject final : public Object {
-protected:
-  std::string m_tag;
+/**
+ * @brief Compile-time constant. 
+ * @details If true, methods can throw exceptions when an error occurs.
+ * If false, methods will not throw exceptions, but will instead return a default value.
+ */
+constexpr bool AMSExceptions =
+#ifdef AMS_EXCEPTIONS
+  true;
+#else
+  false;
+#endif
   
-public:
-  GameObject() : Object("GameObject") {}
-  explicit GameObject(std::string name) : Object(std::move(name)) {}
+constexpr bool AMSNegativeIndexing =
+#ifdef AMS_NEGATIVE_INDEXING
+  true;
+#else
+  false;
+#endif
   
-  
-};
-
-} // ams
+}

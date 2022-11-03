@@ -14,6 +14,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+module;
 
 export module ams.spatial.Vec2;
 import <stdexcept>;
@@ -185,10 +186,6 @@ struct Vec2 {
 
   constexpr Vec2<T> operator!() const {
     return Vec2<T>(!x, !y);
-  }
-
-  constexpr Vec2<T> operator~() const {
-    return Vec2<T>(~x, ~y);
   }
 
   // lhs-rhs operators

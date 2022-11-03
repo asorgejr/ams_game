@@ -15,25 +15,20 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*[exclude begin]*/
-#pragma once
-#include "Object.hpp"
-/*[exclude end]*/
-/*[export module ams.GameObject]*/
-/*[import ams.Object]*/
+export module ams.game.config;
+import <chrono>;
 
+using namespace std::chrono_literals;
 
-namespace ams {
+export namespace ams {
 
-class GameObject final : public Object {
-protected:
-  std::string m_tag;
-  
-public:
-  GameObject() : Object("GameObject") {}
-  explicit GameObject(std::string name) : Object(std::move(name)) {}
-  
-  
-};
+/** the type of clock used by the application */
+using clk_t = std::chrono::high_resolution_clock;
+
+/** The unit of time used for time calculations in the application. */
+using time_unit = std::chrono::microseconds;
+
+/** 1 second in time_unit */
+constexpr auto time_unit_1s = duration_cast<time_unit>(1s);
 
 } // ams

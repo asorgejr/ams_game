@@ -17,11 +17,12 @@
 /*[exclude begin]*/
 #pragma once
 
-#include "ams/impl/config.hpp"
+#include "config.hpp"
 /*[exclude end]*/
 /*[export module ams.Math]*/
 #include <cmath>
 #include <type_traits>
+#include <algorithm>
 #include <stdexcept>
 #include <gcem.hpp>
 /*[import ams.config]*/
@@ -681,7 +682,7 @@ template<NumericT TNum>
  */
 template<DecimalT TNum>
 [[nodiscard]] constexpr bool is_naught(TNum value, TNum epsilon = std::numeric_limits<TNum>::epsilon()) {
-  return std::abs(value) < epsilon;
+  return abs(value) < epsilon;
 }
 
 /**
@@ -695,7 +696,7 @@ template<DecimalT TNum>
  */
 template<DecimalT TNum>
 [[nodiscard]] constexpr bool is_equal(TNum a, TNum b, TNum epsilon = std::numeric_limits<TNum>::epsilon()) {
-  return std::abs(a - b) < epsilon;
+  return abs(a - b) < epsilon;
 }
 
 template<NumericT TNum1, NumericT TNum2>

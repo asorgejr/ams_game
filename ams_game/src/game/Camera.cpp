@@ -16,12 +16,23 @@
  */
 
 #ifndef AMS_MODULES
-#include "../../../include/ams/spatial/Vec/Vec4.hpp"
+#include "ams/game/Camera.hpp"
+#include "ams/game/Entity.hpp"
+#include "ams/game/Scene.hpp"
 #else
-import ams.spatial.Vec4;
+import ams.game.Camera;
+import ams.game.Entity;
+import ams.game.Scene;
 #endif
 
 namespace ams {
 
+using namespace ams::internal;
+
+Camera::Camera(ams::Entity* entity) : ActiveComponent(entity) {
+  entity->getScene()->registerCamera(this);
+}
+
+// TODO: Add a way to unregister the camera from the scene
 
 } // ams

@@ -17,8 +17,6 @@
 
 export module ams;
 export import ams.config;
-export import ams.Math;
-export import ams.uuid;
 export import ams.Array;
-
-
+export import ams.Uuid;
+export import ams.Math;

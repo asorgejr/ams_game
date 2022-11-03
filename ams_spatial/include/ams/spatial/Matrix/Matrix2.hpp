@@ -14,16 +14,21 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
+/*[module]*/
 /*[exclude begin]*/
 #pragma once
 #include <ams/Array.hpp>
+#include "ams_spatial_export.hpp"
 #include "ams/spatial/internal/matrix.hpp"
 #include "../Vec.hpp"
 /*[exclude end]*/
+/*[ignore begin]*/
+#include "ams_spatial_export.hpp"
+/*[ignore end]*/
 /*[export module ams.spatial.Matrix2]*/
 /*[import <concepts>]*/
 /*[import <stdexcept>]*/
+/*[import ams_spatial]*/
 /*[import ams]*/
 /*[import ams.spatial.internal]*/
 /*[import ams.spatial.Vec]*/
@@ -44,7 +49,7 @@ struct Matrix4;
 /**
  * @brief A 2x2 matrix. This is a row-major matrix.
  */
-struct Matrix2 {
+struct AMS_SPATIAL_EXPORT Matrix2 {
 protected:
   Array<Array<decimal_t, 2>, 2> m{0};
 public:

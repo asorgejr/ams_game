@@ -20,7 +20,7 @@ endif()
 
 
 ## Create library
-  add_library(${COMPONENT_NAME} SHARED
+add_library(${COMPONENT_NAME} SHARED
   ${${COMPONENT_NAME}_SOURCES}
 )
 add_library(${PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_NAME})
@@ -35,6 +35,7 @@ target_link_libraries(${COMPONENT_NAME}
     Boost::boost
     gcem
 )
+
 if(ENABLE_MODULES)
   set(MODULES_LIST " ")
   files_to_interface(VAR MODULES_LIST
@@ -52,14 +53,21 @@ else()
   )
 endif()
 
+# api export header
+string(TOUPPER ${PROJECT_NAME}_${COMPONENT_NAME} API_MACRO_NAME)
+generate_export_header(${COMPONENT_NAME}
+  BASE_NAME ${COMPONENT_NAME}
+  EXPORT_MACRO_NAME ${API_MACRO_NAME}_EXPORT
+  EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}_${COMPONENT_NAME}_export.hpp
+  STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC
+)
+target_include_directories(${COMPONENT_NAME}
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
 if (ENABLE_MODULES)
-  message(STATUS "Modules enabled")
-  #    target_compile_options(${PROJECT_NAME} PRIVATE -fmodules-ts)
-  target_compile_definitions(${COMPONENT_NAME}
-    PUBLIC
-      AMS_MODULES
-  )
-  #if compiler is gnu or clang and version is less than 12, use -fmodules-ts
   if(GNU OR CLANG)
     if(AMS_COMPILER_VERSION LESS 12)
       target_compile_options(${COMPONENT_NAME} PUBLIC -fmodules-ts)

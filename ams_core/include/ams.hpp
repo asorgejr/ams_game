@@ -18,13 +18,11 @@
 /*[exclude begin]*/
 #pragma once
 #include "ams/Math.hpp"
-#include "ams/uuid.hpp"
+#include "ams/Uuid.hpp"
 #include "ams/Array.hpp"
 /*[exclude end]*/
 /*[export module ams]*/
 /*[export import ams.config]*/
-/*[export import ams.Math]*/
-/*[export import ams.uuid]*/
 /*[export import ams.Array]*/
-
-
+/*[export import ams.Uuid]*/
+/*[export import ams.Math]*/

@@ -14,42 +14,112 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-export module ams.Transform;
-import ams.private.config;
-import ams.Component;
+export module ams.game.Transform;
+import ams.internal.config;
+import ams.spatial;
+import ams.game.Component;
 
-namespace ams {
+class Entity;
 
-class Transform : public Component {
-public:
-    Transform() = default;
-    ~Transform() override = default;
-    constexpr void SetPosition(const Vec3<double>& position) { m_position = position; }
-    constexpr void SetRotation(const Vec3<double>& rotation) { m_rotation = rotation; }
-    constexpr void SetScale(const Vec3<double>& scale) { m_scale = scale; }
-    constexpr void SetPosition(float x, float y, float z) { m_position = Vec3<decimal_t>(x, y, z); }
-    constexpr void SetRotation(float x, float y, float z) { m_rotation = Vec3<decimal_t>(x, y, z); }
-    constexpr void SetScale(float x, float y, float z) { m_scale = Vec3<decimal_t>(x, y, z); }
-    constexpr void Translate(const Vec3<double>& translation) { m_position += translation; }
-    constexpr void Translate(float x, float y, float z) { m_position += Vec3<decimal_t>(x, y, z); }
-    constexpr void Rotate(const Vec3<double>& rotation) { m_rotation += rotation; }
-    constexpr void Rotate(float x, float y, float z) { m_rotation += Vec3<decimal_t>(x, y, z); }
-    constexpr void Scale(const Vec3<double>& scale) { m_scale += scale; }
-    void Scale(float x, float y, float z) { m_scale += Vec3<decimal_t>(x, y, z); }
-    const Vec3<double>& GetPosition() const { return m_position; }
-    const Quaternion& GetRotation() const { return m_rotation; }
-    const Vec3<double>& GetScale() const { return m_scale; }
-    const Matrix4& GetModelMatrix() const { return m_modelMatrix; }
-    void UpdateModelMatrix() {
-      translate(m_modelMatrix, m_position);
-      rotate(m_modelMatrix, m_rotation);
-      scale(m_modelMatrix, m_scale);
-    }
+export namespace ams {
+
+class AMS_GAME_EXPORT Transform final : public Component {
 private:
-    Vec3<double> m_position = Vec3(0.0, 0.0, 0.0);
-    Quaternion m_rotation = Quaternion::identity();
-    Vec3<double> m_scale = Vec3(1.0, 1.0, 1.0);
-    Matrix4 m_modelMatrix = Matrix4::identity();
+  Vec3<decimal_t> m_position = Vec3(0.0, 0.0, 0.0);
+  Quaternion m_rotation = Quaternion::identity();
+  Vec3<decimal_t> m_scale = Vec3(1.0, 1.0, 1.0);
+  Matrix4 m_modelMatrix = Matrix4::identity();
+  Transform* m_parent = nullptr;
+  std::vector<Transform*> m_children;
+public:
+  explicit Transform(Entity* entity) : Component(entity) {}
+
+  constexpr void setPosition(decimal_t x, decimal_t y, decimal_t z) { m_position.x = x; m_position.y = y; m_position.z = z; }
+
+  constexpr void setPosition(const Vec3<decimal_t>& position) { m_position = position; }
+
+  constexpr void setRotation(decimal_t x, decimal_t y, decimal_t z) { m_rotation = Vec3<decimal_t>(x, y, z); }
+
+  constexpr void setRotation(const Vec3<decimal_t>& rotation) { m_rotation = rotation; }
+
+  constexpr void setScale(decimal_t x, decimal_t y, decimal_t z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }
+
+  constexpr void setScale(const Vec3<decimal_t>& scale) { m_scale = scale; }
+
+  constexpr void translate(const Vec3<decimal_t>& translation) { m_position += translation; }
+
+  constexpr void translate(decimal_t x, decimal_t y, decimal_t z) { m_position.x += x; m_position.y += y; m_position.z += z; }
+
+  /**
+   * @brief rotate the transform by the given euler angles in degrees.
+   * @param x - The rotation around the x axis in degrees.
+   * @param y - The rotation around the y axis in degrees.
+   * @param z - The rotation around the z axis in degrees.
+   */
+  constexpr void rotate(decimal_t x, decimal_t y, decimal_t z) { m_rotation *= Quaternion::fromEuler(radians(Vec3<decimal_t>(x, y, z))); }
+
+  /**
+   * @brief rotate the transform by the given euler angles in degrees.
+   * @param rotation - The rotation around the x, y, and z axis in degrees.
+   */
+  constexpr void rotate(const Vec3<decimal_t>& rotation) { m_rotation *= Quaternion::fromEuler(radians(rotation)); }
+
+  /**
+   * @brief rotate the transform by the given quaternion.
+   * @param rotation - The rotation quaternion.
+   */
+  constexpr void rotate(const Quaternion& q) { m_rotation *= q; }
+
+  /**
+   * @brief scale the transform by the given scale factors.
+   * @param x - The scale factor along the x axis.
+   * @param y - The scale factor along the y axis.
+   * @param z - The scale factor along the z axis.
+   */
+  constexpr void scale(decimal_t x, decimal_t y, decimal_t z) { m_scale.x *= x; m_scale.y *= y; m_scale.z *= z; }
+
+  /**
+   * @brief scale the transform by the given vector.
+   * @param scale - The scale vector.
+   */
+  constexpr void scale(const Vec3<decimal_t>& scale) { m_scale *= scale; }
+  
+  /**
+   * @brief Set the parent of this transform.
+   * @param parent - The parent transform.
+   */
+  void setParent(Transform* parent) {
+    if (m_parent != nullptr) {
+      m_parent->m_children.erase(
+        std::remove(m_parent->m_children.begin(), m_parent->m_children.end(), this), m_parent->m_children.end());
+    }
+    m_parent = parent;
+    if (parent != nullptr && !parent->hasChild(this)) {
+      parent->m_children.push_back(this);
+    }
+  }
+
+  [[nodiscard]] const Vec3<decimal_t>& getPosition() const { return m_position; }
+
+  [[nodiscard]] const Quaternion& getRotation() const { return m_rotation; }
+
+  [[nodiscard]] const Vec3<decimal_t>& getScale() const { return m_scale; }
+
+  [[nodiscard]] const Matrix4& getModelMatrix() const { return m_modelMatrix; }
+  
+  [[nodiscard]] const Transform* getParent() const { return m_parent; }
+  
+  [[nodiscard]] const std::vector<Transform*>& getChildren() const { return m_children; }
+  
+  [[nodiscard]] bool hasChild(const Transform* child) const {
+    return std::find(m_children.begin(), m_children.end(), child) != m_children.end();
+  }
+
+  void updateModelMatrix() {
+    m_modelMatrix.scale(m_scale);
+    m_modelMatrix.rotate(m_rotation);
+    m_modelMatrix.translate(m_position);
+  }
 };
 
 } // ams

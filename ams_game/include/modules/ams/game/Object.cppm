@@ -15,23 +15,38 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export module ams.Object;
+export module ams.game.Object;
 import <string>;
-import ams.uuid;
+import <random>;
+export import ams.game.Exceptions;
 
 
-namespace ams {
+export namespace ams {
 
-class Object {
+using uuid_t = uint64_t;
+
+/**
+ * @brief The Object class is the base class for all objects in the game engine.
+ * @details The Object class is the base class for all objects in the game engine.
+ * It stores the a name and a unique identifier.
+ */
+class AMS_GAME_EXPORT Object {
 protected:
-  uuid m_id;
-  std::string m_name;
+  uuid_t id;
+  std::string name;
 public:
-  Object() : m_id(), m_name("Object") {}
-  explicit Object(std::string name) : m_id(), m_name(std::move(name)) {}
+  Object() : id(dis(gen)) {
+    name = "Object_" + std::to_string(id);
+  }
+  explicit Object(const std::string& name) : id(dis(gen)), name(name) {}
 
-  [[nodiscard]] const uuid& id() const { return m_id; }
-  [[nodiscard]] const std::string& name() const { return m_name; }
+  [[nodiscard]] uuid_t getId() { return id; }
+  [[nodiscard]] const std::string& getName() const { return name; }
+  
+private:
+  inline static std::random_device rd{};
+  inline static std::mt19937 gen{rd()};
+  inline static std::uniform_int_distribution<uint64_t> dis{};
 };
 
 } // ams

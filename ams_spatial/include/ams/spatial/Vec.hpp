@@ -17,7 +17,8 @@
 /*[module]*/
 /*[exclude begin]*/
 #pragma once
-#include <ams/impl/config.hpp>
+#include <ams/config.hpp>
+#include "ams_spatial_export.hpp"
 /*[exclude end]*/
 
 /*[export module ams.spatial.Vec]*/
@@ -31,6 +32,7 @@
 #include "Vec/Vec3.hpp"
 #include "Vec/Vec4.hpp"
 /*[exclude end]*/
+/*[import ams_spacial]*/
 /*[import ams]*/
 /*[import ams.spatial.internal.config]*/
 /*[export import ams.spatial.Vec2]*/
@@ -498,6 +500,97 @@ template<Vec4T TVec>
 TVec wrap(TVec val, TVec low, TVec high) {
   return wrap<double>(val, low, high);
 }
+
+/**
+ * @brief converts a value from degrees to radians
+ * @tparam TVec - any 2d vector type
+ * @param v - the value to convert
+ * @return the value in radians
+ */
+template <Vec2T TVec>
+TVec radians(TVec v) {
+  TVec ret = TVec();
+  ret.x = radians(v.x);
+  ret.y = radians(v.y);
+  return ret;
+}
+
+/**
+ * @brief converts a value from degrees to radians
+ * @tparam TVec - any 3d vector type
+ * @param v - the value to convert
+ * @return the value in radians
+ */
+template <Vec3T TVec>
+TVec radians(TVec v) {
+  TVec ret = TVec();
+  ret.x = radians(v.x);
+  ret.y = radians(v.y);
+  ret.z = radians(v.z);
+  return ret;
+}
+
+/**
+ * @brief converts a value from degrees to radians
+ * @tparam TVec - any 4d vector type
+ * @param v - the value to convert
+ * @return the value in radians
+ */
+template <Vec4T TVec>
+TVec radians(TVec v) {
+  TVec ret = TVec();
+  ret.x = radians(v.x);
+  ret.y = radians(v.y);
+  ret.z = radians(v.z);
+  ret.w = radians(v.w);
+  return ret;
+}
+
+/**
+ * @brief converts a value from radians to degrees
+ * @tparam TVec - any 2d vector type
+ * @param v - the value to convert
+ * @return the value in degrees
+ */
+template <Vec2T TVec>
+TVec degrees(TVec v) {
+  TVec ret = TVec();
+  ret.x = degrees(v.x);
+  ret.y = degrees(v.y);
+  return ret;
+}
+
+/**
+ * @brief converts a value from radians to degrees
+ * @tparam TVec - any 3d vector type
+ * @param v - the value to convert
+ * @return the value in degrees
+ */
+template <Vec3T TVec>
+TVec degrees(TVec v) {
+  TVec ret = TVec();
+  ret.x = degrees(v.x);
+  ret.y = degrees(v.y);
+  ret.z = degrees(v.z);
+  return ret;
+}
+
+/**
+ * @brief converts a value from radians to degrees
+ * @tparam TVec - any 4d vector type
+ * @param v - the value to convert
+ * @return the value in degrees
+ */
+template <Vec4T TVec>
+TVec degrees(TVec v) {
+  TVec ret = TVec();
+  ret.x = degrees(v.x);
+  ret.y = degrees(v.y);
+  ret.z = degrees(v.z);
+  ret.w = degrees(v.w);
+  return ret;
+}
+
 
 /**
  * @brief get the distance squared between two points
@@ -1217,7 +1310,7 @@ T1Vec slerp(T1Vec a, T2Vec b, double t) {
   auto qm = T1Vec();
   // Calculate angle between them.
   double cosHalfTheta = a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
-  // if qa=qb or qa=-qb then theta = 0 and we can return qa
+  // if qa=qb or qa=-qb then theta = 0, and we can return qa
   if (abs(cosHalfTheta) >= 1.0){
     qm.w = a.w; qm.x = a.x; qm.y = a.y; qm.z = a.z;
     return qm;

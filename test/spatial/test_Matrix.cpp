@@ -147,25 +147,29 @@ TEST(Matrix3, FromEulerAngles) {
 TEST(Matrix3, FromToEulerAngles) {
   using namespace ams;
   Matrix3 m = ams::fromEulerAngles(0,0,0, true);
-  auto euler = ams::toEulerAngles(m, true);
+  // auto euler = ams::toEulerAngles(m, true);
+  auto euler = degrees(m.eulerangles());
   EXPECT_NEAR(euler.x, 0.0, 1e-5);
   EXPECT_NEAR(euler.y, 0.0, 1e-5);
   EXPECT_NEAR(euler.z, 0.0, 1e-5);
   
   m = ams::fromEulerAngles(90.0, 90, 0.0, true);
-  euler = ams::toEulerAngles(m, true);
+  // euler = ams::toEulerAngles(m, true);
+  euler = degrees(m.eulerangles());
   EXPECT_NEAR(euler.x, 90.0, 1e-5);
   EXPECT_NEAR(euler.y, 90.0, 1e-5);
   EXPECT_NEAR(euler.z, 0.0, 1e-5);
   
   m = ams::fromEulerAngles(-45.0, -90.0, 0.0, true);
-  euler = ams::toEulerAngles(m, true);
+  // euler = ams::toEulerAngles(m, true);
+  euler = degrees(m.eulerangles());
   EXPECT_NEAR(euler.x, -45.0, 1e-5);
   EXPECT_NEAR(euler.y, -90.0, 1e-5);
   EXPECT_NEAR(euler.z, 0.0, 1e-5);
   
   m = ams::fromEulerAngles(0.0, 0.0, 90.0, true);
-  euler = ams::toEulerAngles(m, true);
+  // euler = ams::toEulerAngles(m, true);
+  euler = degrees(m.eulerangles());
   EXPECT_NEAR(euler.x, 0.0, 1e-5);
   EXPECT_NEAR(euler.y, 0.0, 1e-5);
   EXPECT_NEAR(euler.z, 90.0, 1e-5);

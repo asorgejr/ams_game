@@ -17,4 +17,10 @@
 
 module;
 export module ams.spatial;
-import ams.game.Platform;
+export import ams.game.Platform;
+export import ams.game.Entity;
+export import ams.game.Transform;
+export import ams.game.Behavior;
+export import ams.game.Camera;
+export import ams.game.Scene;
+export import ams.game.Application;

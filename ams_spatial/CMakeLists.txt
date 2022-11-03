@@ -39,6 +39,23 @@ target_include_directories(${COMPONENT_NAME}
     $<INSTALL_INTERFACE:include>
 )
 endif()
+
+# api export header
+string(TOUPPER ${PROJECT_NAME}_${COMPONENT_NAME} API_MACRO_NAME)
+GENERATE_EXPORT_HEADER(${COMPONENT_NAME}
+  BASE_NAME ${COMPONENT_NAME}
+  EXPORT_MACRO_NAME ${API_MACRO_NAME}_EXPORT
+  EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}_${COMPONENT_NAME}_export.hpp
+  STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC
+)
+# include headers as interface
+target_include_directories(${COMPONENT_NAME}
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
 target_compile_definitions(${COMPONENT_NAME}
   PUBLIC
     AMS_VEC_SWIZZLE_METHODS
@@ -49,16 +66,17 @@ if(AMS_EXCEPTIONS)
       AMS_EXCEPTIONS
   )
 endif()
+add_dependencies(spatial ams::core)
 target_link_libraries(${COMPONENT_NAME}
   PUBLIC
-    ams::core
+    core
     #Eigen3::Eigen
 )
 target_link_options(${COMPONENT_NAME}
   PUBLIC
     $<$<CXX_COMPILER_ID:GNU>:-Wl,--no-undefined>
     $<$<CXX_COMPILER_ID:Clang>:-Wl,-undefined,error>
-  )
+)
   
 #if(BUILD_TESTS)
 #  add_custom_command(TARGET ${COMPONENT_NAME}

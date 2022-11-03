@@ -14,23 +14,39 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/*[export module ams.config]*/
-/*[exclude begin]*/
-#pragma once
-/*[exclude end]*/
 
-/*[export]*/ namespace ams {
-
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
+#ifndef AMS_MODULES
+#include "ams/game/Entity.hpp"
+#include "ams/game/Component.hpp"
+#include "ams/game/Scene.hpp"
 #else
-  false;
+import ams.game.Entity;
+import ams.game.Component;
+import ams.game.Scene;
 #endif
-  
+
+namespace ams {
+
+Entity::Entity(Scene* scene) : Object(), _behaviors(
+  [&](Behavior* pB) { _scene->registerBehavior(pB); },
+  [&](Behavior* pB) { _scene->unregisterBehavior(pB); }
+  )
+{
+  if constexpr (AMSExceptions)
+    if (scene == nullptr)
+      throw NullPointerException("Scene is null");
+  this->_scene = scene;
+  auto xform = std::make_unique<Transform>(this);
+  _transform = xform.get();
+  _components.emplace_back(std::move(xform));
 }
+
+void Entity::destroy() {
+  _scene->destroyEntity(this);
+}
+
+Scene* Entity::getScene() const {
+  return _scene;
+}
+
+} // ams

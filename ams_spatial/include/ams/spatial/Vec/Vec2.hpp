@@ -14,11 +14,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/*[module]*/
 
 /*[exclude begin]*/
 #pragma once
 #include <ams/Math.hpp>
 #include "../internal/config.hpp"
+#include "ams_spatial_export.hpp"
 /*[exclude end]*/
 /*[export module ams.spatial.Vec2]*/
 #include <stdexcept>
@@ -190,10 +192,6 @@ struct Vec2 {
 
   constexpr Vec2<T> operator!() const {
     return Vec2<T>(!x, !y);
-  }
-
-  constexpr Vec2<T> operator~() const {
-    return Vec2<T>(~x, ~y);
   }
 
   // lhs-rhs operators

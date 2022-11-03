@@ -8,6 +8,7 @@
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_MODULES "c++20+ Module Library" OFF)
 option(AMS_EXCEPTIONS "Enable exceptions" ON)
+option(AMS_NEGATIVE_INDEXING "Enable negative indexing" OFF)
 
 cmake_minimum_required(VERSION 3.16)
 project(ams
@@ -25,6 +26,7 @@ include(CMakeFindDependencyMacro)
 include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(GenerateExportHeader)
 include(cmake/Utils.cmake)
 
 if (BUILD_TESTS)
@@ -35,6 +37,17 @@ endif()
 
 if (AMS_EXCEPTIONS)
   add_compile_definitions(AMS_EXCEPTIONS)
+endif()
+
+if (ENABLE_MODULES AND NOT MSVC)
+    message(WARNING
+"MSVC is currently the only compiler with robust support for building modules using cmake. 
+Ignoring ENABLE_MODULES option.")
+    set(ENABLE_MODULES OFF)
+endif()
+
+if(ENABLE_MODULES)
+  add_compile_definitions(AMS_MODULES)
 endif()
 
 
@@ -79,6 +92,9 @@ add_subdirectory(ams_game)
 if (BUILD_TESTS)
     add_subdirectory(test)
 endif()
+
+
+
 
 
 #### INSTALLATION ####

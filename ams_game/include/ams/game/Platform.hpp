@@ -18,6 +18,7 @@
 /*[export module ams.game.Platform]*/
 
 #include <string>
+#include <thread>
 
 /*[export]*/ namespace ams {
 
@@ -89,7 +90,7 @@ ams::Architecture::ARM,
 .compiler=
 #if defined(AMS_COMPILER_MSVC)
 ams::Compiler::MSVC,
-#elif defined(AMS_COMPILER_CLANG)
+#elif defined(AMS_COMPILER_CLANG) || defined(AMS_COMPILER_APPLECLANG)
 ams::Compiler::Clang,
 #elif defined(AMS_COMPILER_GNU) || defined(AMS_COMPILER_GCC)
   ams::Compiler::GCC,
@@ -99,22 +100,8 @@ ams::Compiler::Clang,
 
 .compiler_version=AMS_COMPILER_VERSION,
 
-.cpu_count=AMS_CPU_CORES
+.cpu_count=static_cast<int>(std::thread::hardware_concurrency())
 };
 
-}
-
-
-#if defined(AMS_OS_WINDOWS)
-#define AMS_EXPORT __declspec(dllexport)
-#define AMS_IMPORT __declspec(dllimport)
-#elif defined(AMS_OS_LINUX)
-#define AMS_EXPORT __attribute__((visibility("default")))
-#define AMS_IMPORT __attribute__((visibility("default")))
-#elif defined(AMS_OS_MACOS)
-#define AMS_EXPORT __attribute__((visibility("default")))
-#define AMS_IMPORT __attribute__((visibility("default")))
-#else
-#error "Unsupported platform"
-#endif
+} // ams
 

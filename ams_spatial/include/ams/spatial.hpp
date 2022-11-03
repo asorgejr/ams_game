@@ -20,6 +20,7 @@
 #pragma once
 #include "spatial/Vec.hpp"
 #include "spatial/Matrix.hpp"
+#include "spatial/Quaternion.hpp"
 /*[exclude end]*/
 /*[export module ams.spatial]*/
 /*[export import ams.spatial.Vec]*/

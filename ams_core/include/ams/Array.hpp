@@ -17,11 +17,13 @@
 
 /*[exclude begin]*/
 #pragma once
-#include "impl/config.hpp"
+#include "config.hpp"
 /*[exclude end]*/
 /*[export module ams.Array]*/
+#include <string>
 #include <array>
 #include <stdexcept>
+#include <vector>
 /*[import ams.config]*/
 
 
@@ -38,62 +40,65 @@
  */
 template <typename T, long N>
 class Array : public std::array<T, N> {
+private:
+  inline static const std::string kOutOfBoundsMsg = "Index out of bounds.";
+  inline static const std::string kEmptyMsg = "Array is empty.";
 public:
   constexpr T &operator[](long index) {
-    if constexpr (AMSExceptions) 
-      if (index < 0 || index >= N) 
-        throw std::out_of_range("Index out of bounds.");
+    if constexpr (AMSExceptions)
+      if (index < 0 || index >= N)
+        throw std::out_of_range(kOutOfBoundsMsg);
     return std::array<T, N>::operator[](index);
   }
   constexpr const T &operator[](long index) const {
-    if constexpr (AMSExceptions) 
-      if (index < 0 || index >= N) 
-        throw std::out_of_range("Index out of bounds.");
+    if constexpr (AMSExceptions)
+      if (index < 0 || index >= N)
+        throw std::out_of_range(kOutOfBoundsMsg);
     return std::array<T, N>::operator[](index);
   }
-  
+
   constexpr T &at(long index) {
-    if constexpr (AMSExceptions) 
-      if (index < 0 || index >= N) 
-        throw std::out_of_range("Index out of bounds.");
+    if constexpr (AMSExceptions)
+      if (index < 0 || index >= N)
+        throw std::out_of_range(kOutOfBoundsMsg);
     return std::array<T, N>::at(index);
   }
-  
+
   constexpr const T &at(long index) const {
-    if constexpr (AMSExceptions) 
-      if (index < 0 || index >= N) 
-        throw std::out_of_range("Index out of bounds.");
+    if constexpr (AMSExceptions)
+      if (index < 0 || index >= N)
+        throw std::out_of_range(kOutOfBoundsMsg);
     return std::array<T, N>::at(index);
   }
-  
+
   constexpr T &front() {
-    if constexpr (AMSExceptions) 
-      if (N == 0) 
-        throw std::out_of_range("Array is empty.");
+    if constexpr (AMSExceptions)
+      if (N == 0)
+        throw std::out_of_range(kEmptyMsg);
     return std::array<T, N>::front();
   }
-  
+
   constexpr const T &front() const {
-    if constexpr (AMSExceptions) 
-      if (N == 0) 
-        throw std::out_of_range("Array is empty.");
+    if constexpr (AMSExceptions)
+      if (N == 0)
+        throw std::out_of_range(kEmptyMsg);
     return std::array<T, N>::front();
   }
-  
+
   constexpr T &back() {
-    if constexpr (AMSExceptions) 
-      if (N == 0) 
-        throw std::out_of_range("Array is empty.");
+    if constexpr (AMSExceptions)
+      if (N == 0)
+        throw std::out_of_range(kEmptyMsg);
     return std::array<T, N>::back();
   }
-  
+
   constexpr const T &back() const {
-    if constexpr (AMSExceptions) 
-      if (N == 0) 
-        throw std::out_of_range("Array is empty.");
+    if constexpr (AMSExceptions)
+      if (N == 0)
+        throw std::out_of_range(kEmptyMsg);
     return std::array<T, N>::back();
   }
-  
+
   /**
    * @brief Reverse the order of the elements in this array.
    * @details This function reverses the order of the elements in this array.
@@ -105,7 +110,7 @@ public:
       std::array<T, N>::operator[](N - i - 1) = temp;
     }
   }
-  
+
   /**
    * @brief Reverse the order of the elements in a copy of this array.
    * @details This function reverses the order of the elements in a copy of this array.
@@ -118,6 +123,47 @@ public:
     }
     return result;
   }
+
+  /**
+   * @brief Slice this array.
+   * @details This function slices this array and returns a new array containing the elements between
+   * the start and end indices. If the end index is greater than the size of the array, an exception
+   * will be thrown.
+   * @param start The index of the first element to include in the slice.
+   * @param end The index of the last element to include in the slice.
+   * @return A new array containing the elements between the start and end indices.
+   */
+  constexpr std::vector<T> slice(long start, long end=N-1) const {
+    if constexpr (AMSExceptions)
+      if (start < 0 || start >= N || end < 0 || end >= N)
+        throw std::out_of_range(kOutOfBoundsMsg);
+    std::vector<T> result(end - start);
+    for (long i = start; i < end; i++) {
+      result[i - start] = std::array<T, N>::operator[](i);
+    }
+    return result;
+  }
+
+  /**
+   * @brief Slice this array.
+   * @details This function slices this array and returns a new array containing the elements between
+   * the start and end indices. If the end index is greater than the size of the array, an exception
+   * will be thrown.
+   * @param start The index of the first element to include in the slice.
+   * @param end The index of the last element to include in the slice.
+   * @return A new array containing the elements between the start and end indices.
+   */
+  constexpr std::vector<T> slice(long start, long end=N-1) {
+    if constexpr (AMSExceptions)
+      if (start < 0 || start >= N || end < 0 || end >= N)
+        throw std::out_of_range(kOutOfBoundsMsg);
+    std::vector<T> result(end - start);
+    for (long i = start; i < end; i++) {
+      result[i - start] = std::array<T, N>::operator[](i);
+    }
+    return result;
+  }
+
 };
 
 } // ams

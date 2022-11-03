@@ -15,12 +15,22 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef AMS_MODULES
-#include "../../../include/ams/spatial/Vec/Vec2.hpp"
-#else
-import ams.spatial.Vec2;
-#endif
+/*[export module ams.game.NullPointerException]*/
+/*[exclude begin]*/
+#pragma once
+#include "Exception.hpp"
+/*[exclude end]*/
+/*[import ams.game.Exception]*/
 
-namespace ams {
 
+/*[export]*/ namespace ams {
+class NullPointerException : public Exception {
+public:
+  using Exception::Exception;
+  NullPointerException() : Exception() {}
+protected:
+  const char* defaultMessage() const noexcept override {
+    return "NullPointerException";
+  }
+};
 } // ams

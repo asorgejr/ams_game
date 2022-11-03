@@ -19,10 +19,19 @@ export module ams.config;
 export namespace ams {
 
 /**
- * @brief Compile-time constant. If true, throws exceptions when an error occurs.
+ * @brief Compile-time constant. 
+ * @details If true, methods can throw exceptions when an error occurs.
+ * If false, methods will not throw exceptions, but will instead return a default value.
  */
 constexpr bool AMSExceptions =
 #ifdef AMS_EXCEPTIONS
+  true;
+#else
+  false;
+#endif
+  
+constexpr bool AMSNegativeIndexing =
+#ifdef AMS_NEGATIVE_INDEXING
   true;
 #else
   false;

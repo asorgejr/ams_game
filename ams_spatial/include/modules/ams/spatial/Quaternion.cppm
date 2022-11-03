@@ -14,6 +14,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+module;
+#include "ams_spatial_export.hpp"
 export module ams.spatial.Quaternion;
 import <cstdlib>;
 import ams;
@@ -23,7 +25,7 @@ namespace ams {
 
 struct Matrix3;
 
-export struct Quaternion : public Vec4<decimal_t> {
+export struct AMS_SPATIAL_EXPORT Quaternion : public Vec4<decimal_t> {
 public:
   constexpr Quaternion() = default;
 
@@ -110,7 +112,7 @@ public:
   constexpr Quaternion operator*(const Matrix3& m) const;
 
   constexpr Quaternion& operator*=(const Matrix3& m);
-
+  
   [[nodiscard]] constexpr Vec3<decimal_t> euler() {
     decimal_t x = this->x;
     decimal_t y = this->y;
@@ -129,6 +131,38 @@ public:
 
   [[nodiscard]] constexpr Quaternion inverted() const {
     return {-this->x, -this->y, -this->z, this->w};
+  }
+  
+  /**
+   * @brief Sets the quaternion to the given euler angles in radians.
+   * @param euler - The euler angles in radians.
+   */
+  constexpr void seteuler(const Vec3<decimal_t>& euler) {
+    decimal_t roll = euler.x;
+    decimal_t pitch = euler.y;
+    decimal_t yaw = euler.z;
+    decimal_t sin_roll = sin(roll * 0.5);
+    decimal_t cos_roll = cos(roll * 0.5);
+    decimal_t sin_pitch = sin(pitch * 0.5);
+    decimal_t cos_pitch = cos(pitch * 0.5);
+    decimal_t sin_yaw = sin(yaw * 0.5);
+    decimal_t cos_yaw = cos(yaw * 0.5);
+    x = sin_roll * cos_pitch * cos_yaw - cos_roll * sin_pitch * sin_yaw;
+    y = cos_roll * sin_pitch * cos_yaw + sin_roll * cos_pitch * sin_yaw;
+    z = cos_roll * cos_pitch * sin_yaw - sin_roll * sin_pitch * cos_yaw;
+    w = cos_roll * cos_pitch * cos_yaw + sin_roll * sin_pitch * sin_yaw;
+  }
+  
+  constexpr void rotate(const Vec3<decimal_t> &axis, decimal_t angle) {
+    *this = Quaternion(axis, angle) * *this;
+  }
+  
+  /**
+   * @brief rotate the quaternion by euler angles in radians
+   * @param euler - Euler angles in radians
+   */
+  constexpr void rotate(const Vec3<decimal_t> &euler) {
+    *this = fromEuler(euler) * *this;
   }
   
   constexpr void lookat(const Vec3<decimal_t>& direction, const Vec3<decimal_t>& up) {
@@ -163,26 +197,15 @@ public:
     return q;
   }
 
-  static constexpr void fromEuler(Quaternion& q, const Vec3<decimal_t>& euler) {
-    decimal_t roll = euler.x;
-    decimal_t pitch = euler.y;
-    decimal_t yaw = euler.z;
-    decimal_t sin_roll = sin(roll * 0.5);
-    decimal_t cos_roll = cos(roll * 0.5);
-    decimal_t sin_pitch = sin(pitch * 0.5);
-    decimal_t cos_pitch = cos(pitch * 0.5);
-    decimal_t sin_yaw = sin(yaw * 0.5);
-    decimal_t cos_yaw = cos(yaw * 0.5);
-    q.x = sin_roll * cos_pitch * cos_yaw - cos_roll * sin_pitch * sin_yaw;
-    q.y = cos_roll * sin_pitch * cos_yaw + sin_roll * cos_pitch * sin_yaw;
-    q.z = cos_roll * cos_pitch * sin_yaw - sin_roll * sin_pitch * cos_yaw;
-    q.w = cos_roll * cos_pitch * cos_yaw + sin_roll * sin_pitch * sin_yaw;
-  }
-
+  /**
+   * @brief Creates a quaternion from euler angles in radians.
+   * @param euler - Euler angles in radians.
+   * @return The quaternion.
+   */
   [[nodiscard]]
   static constexpr Quaternion fromEuler(const Vec3<decimal_t>& euler) {
     Quaternion q;
-    fromEuler(q, euler);
+    q.seteuler(euler);
     return q;
   }
 

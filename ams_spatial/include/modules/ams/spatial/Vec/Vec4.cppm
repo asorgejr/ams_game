@@ -189,11 +189,7 @@ struct Vec4 {
   constexpr Vec4<T> operator!() const {
     return Vec4<T>(!x, !y, !z, !w);
   }
-
-  constexpr Vec4<T> operator~() const {
-    return Vec4<T>(~x, ~y, ~z, ~w);
-  }
-
+  
   // scalar lhs-rhs operators
   constexpr friend Vec4<T> operator+(T lhs, const Vec4<T>& rhs) {
     return Vec4<T>(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z, lhs + rhs.w);

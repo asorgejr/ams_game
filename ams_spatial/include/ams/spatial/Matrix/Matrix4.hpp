@@ -14,13 +14,16 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
+/*[module]*/
 /*[exclude begin]*/
 #pragma once
 #include <ams/Array.hpp>
+#include "ams_spatial_export.hpp"
 #include "../Vec.hpp"
-
 /*[exclude end]*/
+/*[ignore begin]*/
+#include "ams_spatial_export.hpp"
+/*[ignore end]*/
 /*[export module ams.spatial.Matrix4]*/
 /*[import <concepts>]*/
 /*[import <stdexcept>]*/
@@ -58,7 +61,7 @@ struct Matrix3;
 /**
  * @brief 4x4 matrix. This is a row-major matrix.
  */
-struct Matrix4 {
+struct AMS_SPATIAL_EXPORT Matrix4 {
 protected:
   Array<Array<decimal_t, 4>, 4> m{0};
 public:
@@ -274,26 +277,44 @@ public:
   [[maybe_unused]] constexpr bool invert();
 
   /**
-   * @brief Returns the inverse of the Matrix4.
+   * @brief Inverts the Matrix4.
    * @return The inverse of the Matrix4
    */
   [[nodiscard]] constexpr Matrix4 inverted() const;
-  
+
+  /**
+  * @brief Scales the matrix
+  * @param x - x scale
+  * @param y - y scale
+  * @param z - z scale
+  */
   constexpr void scale(decimal_t x, decimal_t y, decimal_t z) {
     // row-major operation. X is right, Y is up, Z is forward.
     m[0][0] *= x;
     m[1][1] *= y;
     m[2][2] *= z;
   }
-  
+
+  /**
+   * @brief Scales the matrix
+   * @param v - scale vector
+   */
   constexpr void scale(const Vec3<decimal_t>& v) {
     scale(v.x, v.y, v.z);
   }
-  
+
+  /**
+   * @brief Scales the matrix
+   * @param s - uniform scale
+   */
   constexpr void scale(decimal_t s) {
     scale(s, s, s);
   }
   
+  /**
+   * @brief Rotates the x axis of the matrix
+   * @param angle - angle in radians
+   */
   constexpr void rotatex(decimal_t angle) {
     // row-major operation. X is right, Y is up, Z is forward.
     decimal_t c = cos(angle);
@@ -316,6 +337,10 @@ public:
     m[2][3] = m23 * c - m13 * s;
   }
   
+  /**
+   * @brief Rotates the y axis of the matrix
+   * @param angle - angle in radians
+   */
   constexpr void rotatey(decimal_t angle) {
     // row-major operation. X is right, Y is up, Z is forward.
     decimal_t c = cos(angle);
@@ -338,6 +363,10 @@ public:
     m[2][3] = m03 * s + m23 * c;
   }
   
+  /**
+   * @brief Rotates the z axis of the matrix
+   * @param angle - angle in radians
+   */
   constexpr void rotatez(decimal_t angle) {
     // row-major operation. X is right, Y is up, Z is forward.
     decimal_t c = cos(angle);
@@ -360,6 +389,13 @@ public:
     m[1][3] = m13 * c - m03 * s;
   }
   
+  /**
+   * @brief Rotates the matrix using an axis and angle
+   * @param axis_x - x component of the axis
+   * @param axis_y - y component of the axis
+   * @param axis_z - z component of the axis
+   * @param angle - angle in radians
+   */
   constexpr void rotate(decimal_t axis_x, decimal_t axis_y, decimal_t axis_z, decimal_t angle) {
     // row-major operation. X is right, Y is up, Z is forward.
     decimal_t c = cos(angle);
@@ -400,22 +436,47 @@ public:
     m[3][3] = m03 * m[0][0] + m13 * m[0][1] + m23 * m[0][2];
   }
   
+  /**
+   * @brief Rotates the matrix using an axis and angle
+   * @param axis - axis
+   * @param angle - angle in radians
+   */
   constexpr void rotate(const Vec3<decimal_t>& axis, decimal_t angle) {
     rotate(axis.x, axis.y, axis.z, angle);
   }
   
+  /**
+   * @brief Rotates the matrix using a quaternion
+   * @param q - quaternion
+   */
   constexpr void rotate(const Quaternion& q);
   
+  /**
+   * @brief Translates the matrix
+   * @param x - x component of the translation
+   * @param y - y component of the translation
+   * @param z - z component of the translation
+   */
   constexpr void translate(decimal_t x, decimal_t y, decimal_t z) {
     m[3][0] += x;
     m[3][1] += y;
     m[3][2] += z;
   }
   
+  /**
+   * @brief Translates the matrix
+   * @param v - translation vector
+   */
   constexpr void translate(const Vec3<decimal_t>& v) {
     translate(v.x, v.y, v.z);
   }
   
+  /**
+   * @brief Shears the matrix
+   * @param x - x component of the shear
+   * @param y - y component of the shear
+   * @param z - z component of the shear
+   */
   constexpr void shear(decimal_t x, decimal_t y, decimal_t z) {
     // row-major operation. X is right, Y is up, Z is forward.
     decimal_t m00 = m[0][0];
@@ -440,6 +501,10 @@ public:
     m[2][3] += m03 * z;
   }
   
+  /**
+   * @brief Shears the matrix
+   * @param v - shear vector
+   */
   constexpr void shear(const Vec3<decimal_t>& v) {
     shear(v.x, v.y, v.z);
   }

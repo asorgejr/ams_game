@@ -76,4 +76,35 @@ constexpr Matrix3 Matrix3::inverted() const {
   return ret;
 }
 
+constexpr Quaternion Matrix3::quaternion() const {
+  decimal_t t = m[0][0] + m[1][1] + m[2][2];
+  decimal_t x, y, z, w;
+  if (t > 0) {
+    decimal_t s = sqrt(t + 1) * 2;
+    x = (m[2][1] - m[1][2]) / s;
+    y = (m[0][2] - m[2][0]) / s;
+    z = (m[1][0] - m[0][1]) / s;
+    w = 0.25 * s;
+  } else if (m[0][0] > m[1][1] && m[0][0] > m[2][2]) {
+    decimal_t s = sqrt(1 + m[0][0] - m[1][1] - m[2][2]) * 2;
+    x = 0.25 * s;
+    y = (m[0][1] + m[1][0]) / s;
+    z = (m[0][2] + m[2][0]) / s;
+    w = (m[2][1] - m[1][2]) / s;
+  } else if (m[1][1] > m[2][2]) {
+    decimal_t s = sqrt(1 + m[1][1] - m[0][0] - m[2][2]) * 2;
+    x = (m[0][1] + m[1][0]) / s;
+    y = 0.25 * s;
+    z = (m[1][2] + m[2][1]) / s;
+    w = (m[0][2] - m[2][0]) / s;
+  } else {
+    decimal_t s = sqrt(1 + m[2][2] - m[0][0] - m[1][1]) * 2;
+    x = (m[0][2] + m[2][0]) / s;
+    y = (m[1][2] + m[2][1]) / s;
+    z = 0.25 * s;
+    w = (m[1][0] - m[0][1]) / s;
+  }
+  return {x, y, z, w};
+}
+
 } // ams

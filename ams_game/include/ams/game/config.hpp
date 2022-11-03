@@ -15,13 +15,23 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef AMS_MODULES
-#include "../../../include/ams/spatial/Vec/Vec3.hpp"
-#else
-import ams.spatial.Vec3;
-#endif
+/*[export module ams.game.config]*/
+/*[exclude begin]*/
+#pragma once
+/*[exclude end]*/
+#include <chrono>
 
-namespace ams {
+using namespace std::chrono_literals;
 
+/*[export]*/ namespace ams {
+
+/** the type of clock used by the application */
+using clk_t = std::chrono::high_resolution_clock;
+
+/** The unit of time used for time calculations in the application. */
+using time_unit = std::chrono::microseconds;
+
+/** 1 second in time_unit */
+constexpr auto time_unit_1s = duration_cast<time_unit>(1s);
 
 } // ams

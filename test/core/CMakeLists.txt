@@ -3,6 +3,7 @@ add_test_module(NAME test_core
   SOURCES
     test_Array.cpp
     test_Math.cpp
+    test_List.cpp
     test_uuid.cpp
   DEPENDENCIES ams::core
   INCLUDE_DIRS

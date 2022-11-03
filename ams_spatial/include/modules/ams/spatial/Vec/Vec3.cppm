@@ -190,10 +190,6 @@ struct Vec3 {
     return Vec3<T>(!x, !y, !z);
   }
 
-  constexpr Vec3<T> operator~() const {
-    return Vec3<T>(~x, ~y, ~z);
-  }
-
   // lhs-rhs operators
   constexpr friend Vec3<T> operator+(const T& lhs, const Vec3<T>& rhs) {
     return Vec3<T>(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z);

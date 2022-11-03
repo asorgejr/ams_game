@@ -25,9 +25,10 @@
 /*[exclude end]*/
 /*[ignore begin]*/
 #include <concepts>
+#include <stdexcept>
+#include "ams_spatial_export.hpp"
 /*[ignore end]*/
 /*[export module ams.spatial.Matrix]*/
-/*[import <stdexcept>]*/
 /*[import ams]*/
 /*[import ams.Array]*/
 /*[import ams.spatial.internal]*/
@@ -42,7 +43,8 @@
 // Requirements are the type must have a double-bracket operator: [][]
 
 
-enum class EulerOrder {
+enum class EulerOrder
+{
   XYZ,
   XZY,
   YXZ,
@@ -51,7 +53,8 @@ enum class EulerOrder {
   ZYX
 };
 
-enum class TRSOrder {
+enum class TRSOrder
+{
   SRT,
   STR,
   RST,
@@ -185,10 +188,12 @@ constexpr Vec4<decimal_t> toQuaternion(const Matrix3& mat) {
     return {s * (mat(2, 1) - mat(1, 2)), s * (mat(0, 2) - mat(2, 0)), s * (mat(1, 0) - mat(0, 1)), 0.25 / s};
   } else if (mat(0, 0) > mat(1, 1) && mat(0, 0) > mat(2, 2)) {
     decimal_t s = 2.0 * sqrt(1.0 + mat(0, 0) - mat(1, 1) - mat(2, 2));
-    return {(mat(2, 1) - mat(1, 2)) / s, (mat(0, 1) + mat(1, 0)) / s, (mat(0, 2) + mat(2, 0)) / s, (mat(1, 2) - mat(2, 1)) / s};
+    return {(mat(2, 1) - mat(1, 2)) / s, (mat(0, 1) + mat(1, 0)) / s, (mat(0, 2) + mat(2, 0)) / s,
+            (mat(1, 2) - mat(2, 1)) / s};
   } else if (mat(1, 1) > mat(2, 2)) {
     decimal_t s = 2.0 * sqrt(1.0 + mat(1, 1) - mat(0, 0) - mat(2, 2));
-    return {(mat(0, 2) - mat(2, 0)) / s, (mat(0, 1) + mat(1, 0)) / s, (mat(1, 2) + mat(2, 1)) / s, (mat(2, 0) - mat(0, 2)) / s};
+    return {(mat(0, 2) - mat(2, 0)) / s, (mat(0, 1) + mat(1, 0)) / s, (mat(1, 2) + mat(2, 1)) / s,
+            (mat(2, 0) - mat(0, 2)) / s};
   } else {
     decimal_t s = 2.0 * sqrt(1.0 + mat(2, 2) - mat(0, 0) - mat(1, 1));
     return {(mat(1, 0) - mat(0, 1)) / s, (mat(0, 2) + mat(2, 0)) / s, (mat(1, 2) + mat(2, 1)) / s,
@@ -205,7 +210,7 @@ constexpr Vec4<decimal_t> toQuaternion(const Matrix3& mat) {
  * @param is_degrees - Whether the angles are in degrees
  * @return The Matrix3 created from the euler angles
  */
-constexpr Matrix3 fromEulerAngles(decimal_t x, decimal_t y, decimal_t z, bool is_degrees=false) {
+constexpr Matrix3 fromEulerAngles(decimal_t x, decimal_t y, decimal_t z, bool is_degrees = false) {
   if (is_degrees) {
     x = radians(x);
     y = radians(y);
@@ -220,7 +225,7 @@ constexpr Matrix3 fromEulerAngles(decimal_t x, decimal_t y, decimal_t z, bool is
   // roll (z-axis rotation)
   decimal_t sz = -sin(z);
   decimal_t cz = cos(z);
-  
+
   // calculate rotation matrix elements
   decimal_t m00 = cy * cz;
   decimal_t m01 = -cy * sz;
@@ -231,7 +236,7 @@ constexpr Matrix3 fromEulerAngles(decimal_t x, decimal_t y, decimal_t z, bool is
   decimal_t m20 = -cx * cz * sy + sx * sz;
   decimal_t m21 = cz * sx + cx * sy * sz;
   decimal_t m22 = cx * cy;
-  
+
   return {m00, m01, m02,
           m10, m11, m12,
           m20, m21, m22};
@@ -243,7 +248,7 @@ constexpr Matrix3 fromEulerAngles(decimal_t x, decimal_t y, decimal_t z, bool is
  * @param is_degrees - Whether the angles are in degrees
  * @return The Matrix3 created from the euler angles
  */
-constexpr Matrix3 fromEulerAngles(const Vec3<decimal_t>& angles, bool is_degrees=false) {
+constexpr Matrix3 fromEulerAngles(const Vec3<decimal_t>& angles, bool is_degrees = false) {
   return fromEulerAngles(angles.x, angles.y, angles.z, is_degrees);
 }
 
@@ -253,7 +258,7 @@ constexpr Matrix3 fromEulerAngles(const Vec3<decimal_t>& angles, bool is_degrees
  * @param is_degrees - Whether to return the euler angles in degrees
  * @return The euler angles extracted from the Matrix3
  */
-constexpr Vec3<decimal_t> toEulerAngles(const Matrix3& mat, bool is_degrees=false) {
+constexpr Vec3<decimal_t> toEulerAngles(const Matrix3& mat, bool is_degrees = false) {
   decimal_t x, y, z;
   decimal_t m00 = mat[0][0];
   decimal_t m01 = mat[0][1];
@@ -295,7 +300,7 @@ constexpr Vec3<decimal_t> toEulerAngles(const Matrix3& mat, bool is_degrees=fals
     y = degrees(y);
     z = degrees(z);
   }
-  
+
   return {x, y, z};
 }
 
@@ -577,7 +582,7 @@ constexpr void rotate(Matrix3& mat, const Vec3<decimal_t>& eulerAngles, EulerOrd
  * @param mat - The matrix to rotate
  * @param quat - The quaternion to rotate by
  */
-constexpr void rotate(Matrix3& mat, const Quaternion& quat);
+constexpr void AMS_SPATIAL_EXPORT rotate(Matrix3& mat, const Quaternion& quat);
 
 /**
  * @brief Rotates a matrix by a euler angle
@@ -625,7 +630,7 @@ constexpr void rotate(Matrix4& mat, const Vec3<decimal_t>& eulerAngles, EulerOrd
  * @param mat - The matrix to rotate
  * @param quat - The quaternion to rotate by
  */
-constexpr void rotate(Matrix4& mat, const Quaternion& quat);
+constexpr void AMS_SPATIAL_EXPORT rotate(Matrix4& mat, const Quaternion& quat);
 
 
 /**
@@ -676,7 +681,7 @@ constexpr Vec2<decimal_t> diagonal(const Matrix2& mat) {
  * @return - The diagonal of the Matrix3
  */
 constexpr Vec3<decimal_t> diagonal(const Matrix3& mat) {
-  return { mat[0][0], mat[1][1], mat[2][2] };
+  return {mat[0][0], mat[1][1], mat[2][2]};
 }
 
 /**
@@ -685,7 +690,7 @@ constexpr Vec3<decimal_t> diagonal(const Matrix3& mat) {
  * @return - The diagonal of the Matrix4
  */
 constexpr Vec3<decimal_t> diagonal(const Matrix4& mat) {
-  return { mat[0][0], mat[1][1], mat[2][2] };
+  return {mat[0][0], mat[1][1], mat[2][2]};
 }
 
 
@@ -983,7 +988,6 @@ constexpr bool inverse(Matrix4& mat) {
 }
 
 
-
 constexpr void perspective(Matrix3& mat, decimal_t fovy, decimal_t aspect,
                            decimal_t near, decimal_t far) {
   decimal_t f = safe_div(1, tan(fovy / 2));
@@ -1118,29 +1122,29 @@ constexpr void frustum(Matrix4& mat, decimal_t left, decimal_t right, decimal_t 
 }
 
 
-constexpr Matrix2 maketransform(const Vec2<decimal_t>& t, decimal_t r, const Vec2<decimal_t>& s,
-                                const Vec2<decimal_t>& p, TRSOrder trsOrder);
+constexpr Matrix2 AMS_SPATIAL_EXPORT maketransform(const Vec2<decimal_t>& t, decimal_t r, const Vec2<decimal_t>& s,
+                                                   const Vec2<decimal_t>& p, TRSOrder trsOrder);
 
-constexpr Matrix3 maketransform(const Vec3<decimal_t>& r, const Vec3<decimal_t>& s,
-                                TRSOrder trsOrder, EulerOrder eulerOrder);
+constexpr Matrix3 AMS_SPATIAL_EXPORT maketransform(const Vec3<decimal_t>& r, const Vec3<decimal_t>& s,
+                                                   TRSOrder trsOrder, EulerOrder eulerOrder);
 
-constexpr Matrix4 maketransform(const Vec3<decimal_t>& t, const Vec3<decimal_t>& r,
-                                const Vec3<decimal_t>& s, const Vec3<decimal_t>& p,
-                                const Vec3<decimal_t>& pr, TRSOrder trsOrder, EulerOrder eulerOrder);
+constexpr Matrix4 AMS_SPATIAL_EXPORT maketransform(const Vec3<decimal_t>& t, const Vec3<decimal_t>& r,
+                                                   const Vec3<decimal_t>& s, const Vec3<decimal_t>& p,
+                                                   const Vec3<decimal_t>& pr, TRSOrder trsOrder, EulerOrder eulerOrder);
 
-constexpr Matrix3 maketransform(const Vec3<decimal_t>& forward, const Vec3<decimal_t>& up);
+constexpr Matrix3 AMS_SPATIAL_EXPORT maketransform(const Vec3<decimal_t>& forward, const Vec3<decimal_t>& up);
 
-constexpr Matrix4 maketransform(const Vec3<decimal_t>& t, const Vec3<decimal_t>& forward,
-                                const Vec3<decimal_t>& up);
+constexpr Matrix4 AMS_SPATIAL_EXPORT maketransform(const Vec3<decimal_t>& t, const Vec3<decimal_t>& forward,
+                                                   const Vec3<decimal_t>& up);
 
 
-constexpr Vec3<decimal_t> ptransform(const Vec3<decimal_t>& pos, const Matrix3& mat);
+constexpr Vec3<decimal_t> AMS_SPATIAL_EXPORT ptransform(const Vec3<decimal_t>& pos, const Matrix3& mat);
 
-constexpr Vec3<decimal_t> ptransform(const Vec3<decimal_t>& pos, const Matrix4& mat);
+constexpr Vec3<decimal_t> AMS_SPATIAL_EXPORT ptransform(const Vec3<decimal_t>& pos, const Matrix4& mat);
 
-constexpr Vec3<decimal_t> ntransform(const Vec3<decimal_t>& normal, const Matrix3& mat);
+constexpr Vec3<decimal_t> AMS_SPATIAL_EXPORT ntransform(const Vec3<decimal_t>& normal, const Matrix3& mat);
 
-constexpr Vec3<decimal_t> ntransform(const Vec3<decimal_t>& normal, const Matrix4& mat);
+constexpr Vec3<decimal_t> AMS_SPATIAL_EXPORT ntransform(const Vec3<decimal_t>& normal, const Matrix4& mat);
 
 #pragma endregion Funcs
 

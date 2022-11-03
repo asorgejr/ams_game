@@ -16,11 +16,11 @@
  */
 
 #ifndef AMS_MODULES
-#include "../include/ams/uuid.hpp"
+#include "ams/game/internal/ActiveComponent.hpp"
 #else
-import ams.uuid;
+import ams.game.internal.ActiveComponent;
 #endif
 
-namespace ams {
+namespace ams::internal {
 
-}
+} // ams

@@ -13,6 +13,7 @@ add_test_module(NAME test_spatial
 
 add_executable(testv_spatial testv_matrix.cpp)
 target_link_libraries(testv_spatial PRIVATE
+  ams::core
   ams::spatial
 )
 

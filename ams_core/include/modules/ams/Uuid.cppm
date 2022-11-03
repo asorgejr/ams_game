@@ -17,17 +17,18 @@
 
 module;
 #include <boost/multiprecision/cpp_int.hpp>
+#include "ams_core_export.hpp"
 
-export module ams.uuid;
+export module ams.Uuid;
 import <array>;
 import <random>;
 import <sstream>;
+import <ranges>;
+import <algorithm>;
 import ams.config;
 
 
 namespace ams {
-
-const size_t _UUID_SIZE = 2;
 
 using uint128_t = boost::multiprecision::uint128_t;
 
@@ -36,7 +37,7 @@ using uint128_t = boost::multiprecision::uint128_t;
  * @details This class generates a UUID based on the RFC 4122 standard.
  * @see https://tools.ietf.org/html/rfc4122
  */
-export struct uuid final {
+export struct AMS_CORE_EXPORT Uuid final {
 private:
   /**
    * The underlying data of the UUID. A series of 8 64-bit integers.
@@ -47,26 +48,26 @@ public:
   /**
    * @brief Construct a new uuid object
    */
-  uuid() : data(dis(gen)) {}
+  Uuid() : data(dis(gen)) {}
   
-  constexpr uuid(uint64_t val1, uint64_t val2)
+  constexpr Uuid(uint64_t val1, uint64_t val2)
     : data((uint128_t(val1) << 64) | uint128_t(val2)) {}
 
   /**
    * @brief Construct a new uuid object
    * @param other - The uuid to copy
    */
-  constexpr uuid(const uuid& other) {
+  constexpr Uuid(const Uuid& other) {
     data = other.data;
   }
   
-  constexpr uuid& operator=(const uuid& other) = default;
+  constexpr Uuid& operator=(const Uuid& other) = default;
 
-  constexpr bool operator==(const uuid& other) const {
+  constexpr bool operator==(const Uuid& other) const {
     return data == other.data;
   }
 
-  constexpr bool operator!=(const uuid& other) const {
+  constexpr bool operator!=(const Uuid& other) const {
     return !(*this == other);
   }
 
@@ -86,7 +87,8 @@ public:
   static constexpr bool is_valid_str(const std::string& str) {
     if (str.length() != 32)
       return false;
-    return std::ranges::all_of(str, [](char c) {
+    // return std::ranges::all_of(str, [](char c) {
+    return std::all_of(str.begin(), str.end(), [](char c) {
       return std::isxdigit(c);
     });
   }
@@ -96,7 +98,8 @@ public:
       return false;
     if (str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-')
       return false;
-    return std::ranges::all_of(str, [](char c) {
+    // return std::ranges::all_of(str, [](char c) {
+    return std::all_of(str.begin(), str.end(), [](char c) {
       return std::isxdigit(c) || c == '-';
     });
   }
@@ -121,10 +124,10 @@ public:
    * @param str - The 32 char hex string to create the uuid from
    * @return uuid - The uuid created from the hex string
    */
-  static uuid from_str(const std::string& str) {
+  static Uuid from_str(const std::string& str) {
     if (!is_valid_str(str))
       throw std::invalid_argument("Invalid string");
-    uuid u;
+    Uuid u;
     std::stringstream ss;
     ss << std::hex << str;
     ss >> u.data;
@@ -136,7 +139,7 @@ public:
    * @param str - The 8-4-4-4-12 formatted hex string to create the uuid from
    * @return uuid - The uuid created from the hex string
    */
-  static uuid from_strfmt(const std::string& str) {
+  static Uuid from_strfmt(const std::string& str) {
     if (!is_valid_strfmt(str))
       throw std::invalid_argument("Invalid string");
     std::string unformatted = str;
