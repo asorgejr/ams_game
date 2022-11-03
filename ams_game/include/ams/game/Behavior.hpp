@@ -20,7 +20,6 @@
 #include "ams_game_export.hpp"
 /*[ignore end]*/
 
-
 /**
  * This macro function is used to define a new Behavior class and should always be included at the beginning of the
  * class code block. It includes some boilerplate code to make it easier to define a new Behavior class.
