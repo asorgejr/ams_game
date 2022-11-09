@@ -15,44 +15,17 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*[export module ams.game.Object]*/
-/*[exclude begin]*/
-#pragma once
-#include "ams_game_export.hpp"
-#include "ams/game/Exceptions.hpp"
-/*[exclude end]*/
-/*[export]*/ #include <string>
-#include <random>
-/*[export import ams.game.Exceptions]*/
+#ifndef AMS_MODULES
+#include "ams/game/MeshLoaders/ObjMeshLoader.hpp"
+#else
+import ams.game.MeshLoaders.ObjMeshLoader;
+#endif
 
-/*[export]*/ using std::string;
 
-/*[export]*/ namespace ams {
+namespace ams {
 
-using uuid_t = uint64_t;
-
-/**
- * @brief The Object class is the base class for all objects in the game engine.
- * @details The Object class is the base class for all objects in the game engine.
- * It stores the a name and a unique identifier.
- */
-class AMS_GAME_EXPORT Object {
-protected:
-  const uuid_t id;
-  std::string name;
-public:
-  Object() : id(dis(gen)) {
-    name = "Object_" + std::to_string(id);
-  }
-  explicit Object(const std::string& name) : id(dis(gen)), name(name) {}
-
-  [[nodiscard]] const uuid_t& getId() const { return id; }
-  [[nodiscard]] const std::string& getName() const { return name; }
-  
-private:
-  inline static std::random_device rd{};
-  inline static std::mt19937 gen{rd()};
-  inline static std::uniform_int_distribution<uint64_t> dis{};
-};
+const std::string ObjMeshLoader::filetype() const {
+  return "obj";
+}
 
 } // ams

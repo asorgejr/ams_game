@@ -19,9 +19,11 @@
 /*[exclude begin]*/
 #pragma once
 #include <ams/Math.hpp>
+#include "config.hpp"
 /*[exclude end]*/
 #include <chrono>
 /*[import ams.Math]*/
+/*[import ams.game.config]*/
 
 // chrono literals
 using namespace std::chrono_literals;
@@ -44,19 +46,41 @@ template<TDuration T>
 [[nodiscard]] T fpsToUnit(float fps) {
   constexpr auto tu1s = duration_cast<T>(1s); // 1 second in T units
   auto step = safe_div(1.0f, fps);
-  return duration_cast<time_unit>(tu1s * step);
+  return duration_cast<T>(tu1s * step);
 }
 
 /**
  * @brief Converts a duration to a frame-per-second value.
  * @tparam T - The duration type.
- * @param unit - The duration value i.e. (1/60) in std::chrono::milliseconds.
+ * @param unit - The duration value i.e. (1/60) as a std::chrono duration type.
  * @return The frame-per-second value i.e. 60.
  */
 template<TDuration T>
 [[nodiscard]] float unitToFps(T unit) {
-  constexpr auto tusize = duration_cast<T>(1s).count(); // 1 second in T units as number
+  constexpr auto tusize = double_t(duration_cast<T>(1s).count()); // 1 second in T units as number
   return safe_div(tusize, unit.count());
 }
+
+namespace internal {
+template<typename T>
+concept TExcception = std::is_base_of_v<std::exception, T>;
+template<typename T>
+concept TDefaultConstructible = std::is_default_constructible_v<T> || std::is_void_v<T>;
+}
+/**
+ * @brief If AMSExceptions is enabled, throws an exception, otherwise returns a default constructed value.
+ * @tparam TEx - The exception type.
+ * @tparam TDefault - The default value type.
+ * @param errmsg - The error message.
+ * @return The default value if exceptions are disabled, otherwise throws an exception.
+ */
+template<internal::TExcception TEx, internal::TDefaultConstructible TDefault>
+TDefault throwOrDefault(const std::string& errmsg) {
+  if constexpr (AMSExceptions)
+    throw TEx(errmsg.c_str());
+  else
+    return TDefault();
+}
+
 
 } // ams

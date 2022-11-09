@@ -15,18 +15,22 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <thread>
-#include <iostream>
 #ifndef AMS_MODULES
 #include "ams/game/Application.hpp"
 #include "ams/game/Scene.hpp"
 #include "ams/game/Util.hpp"
+#include "ams/game/MeshLoaders.hpp"
 #else
 import ams.game.Application;
 import ams.game.Scene;
 import ams.game.Util;
+import ams.game.MeshLoaders;
 #endif
+#include <thread>
+#include <iostream>
+#include <cassert>
 
+#include <GLFW/glfw3.h>
 
 using namespace std::chrono;
 
@@ -34,15 +38,37 @@ namespace ams {
 
 constexpr auto tu0s = time_unit_1s * 0;
 
-Application::Application(const std::string& name)
-  : Object(name) {
+Vec2<int> calcDisplayWindowCenter(const Display& disp, const Vec2<int>& winSize) {
+  auto dispSize = disp.getSize();
+  return Vec2<int>(dispSize.x / 2 - winSize.x / 2, dispSize.y / 2 - winSize.y / 2);
+}
+
+Application::Application(const std::string& name, const WindowConfig& cfg)
+: Object(name),
+_windowConfig(cfg)
+{
+  assert(glfwInit() == GLFW_TRUE);
+
   if (_instance != nullptr) {
-    if constexpr (AMSExceptions) {
-      throw std::runtime_error("Application already exists");
-    }
+    throwOrDefault<std::runtime_error, void>("Application already exists");
     delete _instance;
   }
   _instance = this;
+  _displays = Display::getDisplays();
+  if (_displays.size() == 0) {
+    throwOrDefault<std::runtime_error, void>("No displays found");
+    delete _instance;
+  }
+  auto* win = createWindow(_windowConfig);
+  if (win == nullptr) {
+    throwOrDefault<std::runtime_error, void>("Failed to create window");
+    delete _instance;
+    return;
+  }
+  
+  win->registerWindowCloseCallback({[&]() {
+    _instance->stop();
+  }});
   _currentScene = getDefaultScene();
 }
 
@@ -50,6 +76,8 @@ Application::~Application() {
   if (_instance == this) {
     _instance = nullptr;
   }
+  _windows.clear();
+  glfwTerminate();
 }
 
 Scene* Application::getCurrentScene() const {
@@ -141,7 +169,14 @@ void Application::run() {
     }
 
     _currentScene->onRender();
-    onFrameEnd(); // virtual method - noop unless overridden
+    for (auto& win : _windows) {
+      win->update();
+      if (win->getShouldClose()) {
+        _windows.erase(std::find(_windows.begin(), _windows.end(), win));
+        if (_windows.size() == 0)
+          stop();
+      }
+    }
     // limit frame rate (vsync)
     if (vsyncTime > tu0s) {
       auto sleepTime = vsyncTime - duration_cast<time_unit>(clk_t::now() - lastFrameTime);
@@ -149,6 +184,7 @@ void Application::run() {
         std::this_thread::sleep_for(sleepTime);
       }
     }
+    onFrameEnd(); // virtual method - noop unless overridden
   }
   onRunEnd(); // virtual method - noop unless overridden
   // exit();
@@ -204,6 +240,16 @@ time_unit Application::getFixedFrameTime() const {
   return fixedFrameTime;
 }
 
+Window* Application::getWindow() {
+  if (_windows.empty()) {
+    if constexpr (AMSExceptions) {
+      throw std::runtime_error("No windows exist");
+    }
+    return nullptr;
+  }
+  return _windows[0].get();
+}
+
 void Application::setVsyncTime(float vsyncFPS) {
   if (vsyncFPS < 0.0f) vsyncFPS = 0.0f;
   vsyncTime = fpsToUnit<time_unit>(vsyncFPS);
@@ -211,6 +257,40 @@ void Application::setVsyncTime(float vsyncFPS) {
 
 float Application::getVsyncTime() const {
   return unitToFps<time_unit>(vsyncTime);
+}
+
+Window* Application::getWindow(GLFWwindow* window) {
+  for (auto& win : _windows) {
+    if (win->getHandle() == window)
+      return win.get();
+  }
+  return nullptr;
+}
+
+Window* Application::createWindow(const WindowConfig& cfg) {
+  _windows.push_back(std::make_unique<Window>(_displays[0], _windowConfig));
+  auto* win = _windows[_windows.size()-1].get();
+  if (win == nullptr)
+    return win; // errors handled in App constructor.
+  if (!_windowConfig.fullscreen) {
+    win->setPosition(calcDisplayWindowCenter(_displays[0], _windowConfig.size));
+  }
+  return win;
+}
+
+void Application::handleWindowClose(GLFWwindow* window) {
+  auto* app = getInstance();
+  if (app == nullptr) return;
+  auto* win = getWindow(window);
+  if (win != nullptr) {
+    win->destroy();
+    _windows.erase(std::find_if(_windows.begin(), _windows.end(), [win](auto& upWin) {
+      return upWin.get() == win;
+    }));
+  }
+  if (_windows.empty()) {
+    app->stop();
+  }
 }
 
 } // ams

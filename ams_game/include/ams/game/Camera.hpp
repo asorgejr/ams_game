@@ -16,13 +16,14 @@
  */
 /*[module]*/
 
-/*[ignore begin]*/
-#include "ams_game_export.hpp"
-/*[ignore end]*/
-
 /*[export module ams.game.Camera]*/
 /*[exclude begin]*/
 #pragma once
+/*[exclude end]*/
+/*[ignore begin]*/
+#include "ams_game_export.hpp"
+/*[ignore end]*/
+/*[exclude begin]*/
 #include "internal/ActiveComponent.hpp"
 /*[exclude end]*/
 /*[import ams.game.Component]*/

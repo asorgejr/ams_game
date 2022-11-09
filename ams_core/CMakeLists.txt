@@ -18,17 +18,15 @@ else()
   )
 endif()
 
-
 ## Create library
 add_library(${COMPONENT_NAME} SHARED
   ${${COMPONENT_NAME}_SOURCES}
 )
 add_library(${PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_NAME})
-
 set_target_properties(${COMPONENT_NAME}
   PROPERTIES
-  LINKER_LANGUAGE CXX
-  VERSION ${${PROJECT_NAME}_VERSION}
+    LINKER_LANGUAGE CXX
+    VERSION ${${PROJECT_NAME}_VERSION}
 )
 target_link_libraries(${COMPONENT_NAME}
   PUBLIC

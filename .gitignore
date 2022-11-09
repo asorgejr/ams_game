@@ -639,9 +639,9 @@ lint/tmp/
 # Android Profiling
 *.hprof
 
-
-# 3rd-party binaries
-/**/third_party
-
 # extra build dirs
 cmake-build*/
+
+# testing resources
+test/resources
+test/game/resources

@@ -25,6 +25,8 @@
 // #include <cmath>
 #include <type_traits>
 #include <stdexcept>
+#include <algorithm>
+#include <vector>
 /*[exclude begin]*/
 #include <ams/Math.hpp>
 #include "internal/config.hpp"
@@ -40,6 +42,13 @@
 /*[export import ams.spatial.Vec4]*/
 
 /*[export]*/ namespace ams {
+
+namespace internal {
+
+template <typename T>
+concept VecLike = Vec2T<T> || Vec3T<T> || Vec4T<T>;
+
+} // internal
 
 
 /**
@@ -1337,4 +1346,112 @@ T1Vec slerp(T1Vec a, T2Vec b, double t) {
   return qm;
 }
 
+/**
+ * @brief find the nearest Vec2 to a given point
+ * @tparam Vec2T - any 2d vector type
+ * @param p - the point
+ * @param pc - the point cloud to search
+ * @return the index of the nearest point
+ */
+template<Vec2T Vec2T>
+Vec2T nearest (Vec2T p, std::vector<Vec2T> pc) {
+  Vec2T ret = Vec2T();
+  double min = std::numeric_limits<double>::max();
+  for (auto i = 0; i < pc.size(); i++) {
+    auto d = distance(p, pc[i]);
+    if (d < min) {
+      min = d;
+      ret = pc[i];
+    }
+  }
+  return ret;
+}
+
+/**
+ * @brief find the nearest Vec3 to a given point
+ * @tparam Vec3T - any 3d vector type
+ * @param p - the point
+ * @param pc - the point cloud to search
+ * @return the index of the nearest point
+ */
+template<Vec3T Vec3T>
+Vec3T nearest (Vec3T p, std::vector<Vec3T> pc) {
+  Vec3T ret = Vec3T();
+  double min = std::numeric_limits<double>::max();
+  for (auto i = 0; i < pc.size(); i++) {
+    auto d = distance(p, pc[i]);
+    if (d < min) {
+      min = d;
+      ret = pc[i];
+    }
+  }
+  return ret;
+}
+
+/**
+ * @brief find the nearest Vec4 to a given point
+ * @tparam Vec4T - any 4d vector type
+ * @param p - the point
+ * @param pc - the point cloud to search
+ * @return the index of the nearest point
+ */
+template<Vec4T Vec4T>
+Vec4T nearest (Vec4T p, std::vector<Vec4T> pc) {
+  Vec4T ret = Vec4T();
+  double min = std::numeric_limits<double>::max();
+  for (auto i = 0; i < pc.size(); i++) {
+    auto d = distance(p, pc[i]);
+    if (d < min) {
+      min = d;
+      ret = pc[i];
+    }
+  }
+  return ret;
+}
+
+namespace internal {
+  template<VecLike T>
+  void distanceSortAlgorithm(T p, std::vector<T> &pc) {
+    std::sort(pc.begin(), pc.end(), [p](T a, T b) {
+        return distance(p, a) < distance(p, b);
+    });
+  }
+}
+
+/**
+ * @brief sort a vector of Vec2s by distance (closest to farthest) from a given point
+ * @tparam Vec2T - any 2d vector type
+ * @param p - the point
+ * @param pc - the point cloud to search
+ */
+template<Vec2T Vec2T>
+void sortDistance (Vec2T p, std::vector<Vec2T> &pc) {
+  internal::distanceSortAlgorithm(p, pc);
+}
+
+/**
+ * @brief sort a vector of Vec3s by distance (closest to farthest) from a given point
+ * @tparam Vec3T - any 3d vector type
+ * @param p - the point
+ * @param pc - the point cloud to search
+ */
+template<Vec3T Vec3T>
+void sortDistance (Vec3T p, std::vector<Vec3T> &pc) {
+  internal::distanceSortAlgorithm(p, pc);
+}
+
+/**
+ * @brief sort a vector of Vec4s by distance (closest to farthest) from a given point
+ * @tparam Vec4T - any 4d vector type
+ * @param p - the point
+ * @param pc - the point cloud to search
+ */
+template<Vec4T Vec4T>
+void sortDistance (Vec4T p, std::vector<Vec4T> &pc) {
+  internal::distanceSortAlgorithm(p, pc);
+}
+
+
+
+// end
 }

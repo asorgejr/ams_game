@@ -94,6 +94,7 @@ if (BUILD_TESTS)
 endif()
 
 
+add_subdirectory(util)
 
 
 

@@ -15,6 +15,8 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <cassert>
+
 #ifndef AMS_MODULES
 #include <iostream>
 #include <ams/game.hpp>
@@ -35,6 +37,7 @@ class TestApplication : public Application {
 private:
   time_point<clk_t> start;
   milliseconds duration = 0ms;
+  time_point<clk_t> fstart;
 public:
   using Application::Application;
   TestApplication(const std::string& name, const milliseconds& duration) : Application(name) {
@@ -45,12 +48,20 @@ protected:
   void onRunStart() override {
     start = clk_t::now();
   }
+  
+  void onFrameStart() override {
+    fstart = clk_t::now();
+  }
 
   void onFrameEnd() override {
     auto elapsed = clk_t::now() - start;
     if (duration > 0ms && elapsed > duration) {
       stop();
     }
+    auto fend = clk_t::now();
+    auto usdur = duration_cast<microseconds>(fend - fstart);
+    // std::cout << "fps: " << unitToFps(usdur) << std::endl
+    // << "diff: " << usdur.count() << std::endl;
   }
 };
 
@@ -58,6 +69,7 @@ class TestBehaviorVirtMethods : public Behavior {
 AMSBehavior(TestBehaviorVirtMethods)
 private:
   time_point<clk_t> _start = clk_t::now();
+  time_point<clk_t> _last = _start;
   Application* _app = nullptr;
 public:
   int testUpdate = 0;
@@ -70,12 +82,9 @@ public:
     testWasStarted = true;
     _app = Application::getInstance();
   }
+  
   void onUpdate() override {
     testUpdate++;
-    // if (duration_cast<milliseconds>(clk_t::now() - _start).count() > 1000) {
-    //   _app->stop(); // TODO: this causes SEH exception. For loop iterator in Scene::onUpdate gets corrupted.
-    // }
-    std::cout << "time: " << duration_cast<milliseconds>(clk_t::now() - _start).count() << std::endl;
   }
 };
 
@@ -86,7 +95,7 @@ int main() {
   auto* pEntity = pScene->createEntity();
   auto* pComp = pEntity->addComponent<TestBehaviorVirtMethods>();
   app.setCurrentScene(pScene->getName());
-  // app.setVsyncTime(60);
+  app.setVsyncTime(0);
   app.run();
   
   assert(pComp->testWasEnabled);

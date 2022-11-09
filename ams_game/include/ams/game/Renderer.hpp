@@ -16,67 +16,42 @@
  */
 /*[module]*/
 
-/*[exclude begin]*/
-#pragma once
-/*[exclude end]*/
-
 /*[ignore begin]*/
 #include "ams_game_export.hpp"
 /*[ignore end]*/
-
-/**
- * This macro function is used to define a new Behavior class and should always be included at the beginning of the
- * class code block. It includes some boilerplate code to make it easier to define a new Behavior class.
- */
-#define AMSBehavior(name) \
-public: \
-  using Behavior::Behavior; \
-private:
-
-/*[export module ams.game.Behavior]*/
+/*[export module ams.Renderer]*/
 /*[exclude begin]*/
-#include "internal/ActiveComponent.hpp"
+#pragma once
+#include "Object.hpp"
 /*[exclude end]*/
-/*[import ams.game.ActiveComponent]*/
+/*[import ams.Object]*/
 
 /*[export]*/ namespace ams {
 
+class Application;
+
+class Window;
+
+class Scene;
+
 /**
- * @brief A ams::Behavior is a ams::Component with event methods which can be overridden to add behavioral
- * functionality to a ams::Entity.
+ * @brief The Renderer class is responsible for rendering the scene. 
  */
-class AMS_GAME_EXPORT Behavior : public internal::ActiveComponent {
+class Renderer : public Object {
+private:
+  Application* _application;
+  Window* _window;
+  Scene* _scene;
 public:
-  explicit Behavior(Entity* entity);
-
-  ~Behavior() override = default;
-
   /**
-* @brief onStart is called when the ams::Entity is created.
-*/
-  virtual void onStart() {}
-
-  /**
-   * @brief onUpdate is called every frame.
+   * @brief Render the scene.
    */
-  virtual void onUpdate() {}
+  void render();
 
-  /**
-   * @brief onFixedUpdate is called every fixed frame.
-   */
-  virtual void onFixedUpdate() {}
+private:
+  friend class Application;
 
-  /**
-   * @brief onLateUpdate is called every late frame.
-   */
-  virtual void onLateUpdate() {}
-
-  /**
- * @brief onDestroy is called when the ams::Entity is destroyed.
- */
-  virtual void onDestroy() {}
-
-  friend class Entity;
+  friend class Window;
 };
 
 } // ams

@@ -15,44 +15,22 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*[export module ams.game.Object]*/
+/*[export module ams.game.ISerializable]*/
 /*[exclude begin]*/
 #pragma once
-#include "ams_game_export.hpp"
-#include "ams/game/Exceptions.hpp"
 /*[exclude end]*/
-/*[export]*/ #include <string>
-#include <random>
-/*[export import ams.game.Exceptions]*/
-
-/*[export]*/ using std::string;
+#include <string>
+#include <filesystem>
 
 /*[export]*/ namespace ams {
 
-using uuid_t = uint64_t;
-
-/**
- * @brief The Object class is the base class for all objects in the game engine.
- * @details The Object class is the base class for all objects in the game engine.
- * It stores the a name and a unique identifier.
- */
-class AMS_GAME_EXPORT Object {
-protected:
-  const uuid_t id;
-  std::string name;
+template <typename T>
+class ISerializable {
 public:
-  Object() : id(dis(gen)) {
-    name = "Object_" + std::to_string(id);
-  }
-  explicit Object(const std::string& name) : id(dis(gen)), name(name) {}
-
-  [[nodiscard]] const uuid_t& getId() const { return id; }
-  [[nodiscard]] const std::string& getName() const { return name; }
+  virtual void deserialize(const std::string& data) = 0;
+  virtual std::string serialize() const = 0;
   
-private:
-  inline static std::random_device rd{};
-  inline static std::mt19937 gen{rd()};
-  inline static std::uniform_int_distribution<uint64_t> dis{};
+  virtual ~ISerializable() = default;
 };
 
 } // ams

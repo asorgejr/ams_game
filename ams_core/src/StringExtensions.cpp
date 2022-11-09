@@ -15,44 +15,31 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*[export module ams.game.Object]*/
-/*[exclude begin]*/
-#pragma once
-#include "ams_game_export.hpp"
-#include "ams/game/Exceptions.hpp"
-/*[exclude end]*/
-/*[export]*/ #include <string>
-#include <random>
-/*[export import ams.game.Exceptions]*/
+#ifndef AMS_MODULES
+#include "ams/StringExtensions.hpp"
+#else
+import ams.StringExtensions;
+#endif
 
-/*[export]*/ using std::string;
+namespace ams {
 
-/*[export]*/ namespace ams {
+std::vector<std::string> split(const std::string& str, const std::string& delim) {
+  std::vector<std::string> tokens;
+  size_t prev = 0, pos = 0;
+  do {
+    pos = str.find(delim, prev);
+    if (pos == std::string::npos) pos = str.length();
+    std::string token = str.substr(prev, pos - prev);
+    if (!token.empty()) tokens.push_back(token);
+    prev = pos + delim.length();
+  } while (pos < str.length() && prev < str.length());
+  return tokens;
+}
 
-using uuid_t = uint64_t;
+std::vector<std::string> split(const std::string& str, char delim) {
+  return split(str, std::string(1, delim));
+}
 
-/**
- * @brief The Object class is the base class for all objects in the game engine.
- * @details The Object class is the base class for all objects in the game engine.
- * It stores the a name and a unique identifier.
- */
-class AMS_GAME_EXPORT Object {
-protected:
-  const uuid_t id;
-  std::string name;
-public:
-  Object() : id(dis(gen)) {
-    name = "Object_" + std::to_string(id);
-  }
-  explicit Object(const std::string& name) : id(dis(gen)), name(name) {}
 
-  [[nodiscard]] const uuid_t& getId() const { return id; }
-  [[nodiscard]] const std::string& getName() const { return name; }
-  
-private:
-  inline static std::random_device rd{};
-  inline static std::mt19937 gen{rd()};
-  inline static std::uniform_int_distribution<uint64_t> dis{};
-};
-
+// end
 } // ams

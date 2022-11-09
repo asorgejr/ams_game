@@ -45,7 +45,9 @@ struct Vec4 {
 
   constexpr Vec4(const Vec4<T>& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
 
-  template<Vec4T V4T> constexpr explicit Vec4(const V4T& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
+  template<Vec4T V4T> constexpr Vec4(const V4T& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
+  
+  template<Vec3T V3T> constexpr Vec4(const V3T& v, T w) : x(v.x), y(v.y), z(v.z), w(w) {}
 
 #pragma region operators
 
@@ -56,6 +58,15 @@ struct Vec4 {
     return (&x)[i];
   }
 
+  // const copy assignment operator
+  constexpr Vec4<T>& operator=(const Vec4<T>& other) {
+    x = other.x;
+    y = other.y;
+    z = other.z;
+    w = other.w;
+    return *this;
+  }
+  
   // copy assignment operator
   template<Vec4T V4T> constexpr Vec4<T>& operator=(const V4T& other) {
     x = other.x;

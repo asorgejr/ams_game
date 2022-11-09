@@ -16,26 +16,43 @@
  */
 /*[module]*/
 
+/*[exclude begin]*/
+#pragma once
+/*[exclude end]*/
 /*[ignore begin]*/
 #include "ams_game_export.hpp"
 /*[ignore end]*/
-
 /*[exclude begin]*/
-#pragma once
 #include "config.hpp"
 #include "Object.hpp"
+#include "Display.hpp"
+#include "Window.hpp"
 /*[exclude end]*/
+
+/*[export module ams.game.Application]*/
+
 #include <atomic>
 #include <vector>
 #include <chrono>
 /*[import ams.game.config]*/
 /*[import ams.game.Object]*/
+/*[import ams.game.Display]*/
+/*[import ams.game.Window]*/
 
-/*[export module ams.game.Application]*/
 
 /*[export]*/ namespace ams {
 
 class Scene;
+
+const WindowConfig kDefaultWindowConfig = {
+  .title="Application",
+  .size={ 800, 600 },
+  .position={ 0, 0 },
+  .fullscreen=false,
+  .resizable=true,
+  .maximized=false,
+  .minimized=false,
+};
 
 /**
  * @brief An Application is a singleton that manages the game loop and the game window.
@@ -46,7 +63,10 @@ class Scene;
 class AMS_GAME_EXPORT Application : public Object {
 private:
   inline static Application* _instance;
+  inline static std::vector<std::unique_ptr<Window>> _windows;
   Scene* _currentScene;
+  std::vector<Display> _displays;
+  const WindowConfig _windowConfig = kDefaultWindowConfig;
 protected:
   /** Determines if the game loop should continue. */
   std::atomic_bool running = false;
@@ -65,7 +85,7 @@ protected:
   std::vector<std::unique_ptr<Scene>> scenes;
   
 public:
-  explicit Application(const std::string& name = "Application");
+  Application(const std::string& name="Application", const WindowConfig& cfg=kDefaultWindowConfig);
   
   virtual ~Application();
   
@@ -73,12 +93,12 @@ public:
    * @brief Runs the game loop.
    * @details Runs the game loop. This method is called by the user to start the game loop.
    */
-  void run();
+  virtual void run() final;
 
   /**
    * @brief Stops the game loop.
    */
-  void stop();
+  virtual void stop() final;
   
   /**
    * @brief Stops any threads and closes the game window.
@@ -166,21 +186,60 @@ public:
    */
   time_unit getFixedFrameTime() const;
   
+  /**
+   * @brief Gets the primary window.
+   */
+  Window* getWindow();
+  
+  /**
+   * @brief Gets a Window by pointer if it is associated with the application.
+   * @param window - The window to get.
+   * @return Window* if the window is associated with the application, nullptr otherwise.
+   */
+  static Window* getWindow(GLFWwindow* window);
+  
 protected:
+  /**
+   * @brief This event fires when run is called.
+   */
   virtual void onRunStart() {}
   
+  /**
+   * @brief This event fires when the game loop is stopped.
+   */
   virtual void onRunEnd() {}
   
+  /**
+   * @brief This event fires when the loop starts a new frame.
+   */
   virtual void onFrameStart() {}
   
+  /**
+   * @brief This event fires when the loop ends a frame.
+   */
   virtual void onFrameEnd() {}
   
+  /**
+   * @brief This event fires when the loop starts a new fixed frame.
+   */
   virtual void onFixedFrameStart() {}
   
+  /**
+   * @brief This event fires when the loop ends a fixed frame.
+   */
   virtual void onFixedFrameEnd() {}
   
 private:
   Scene* getDefaultScene();
+  
+  /**
+   * @brief Generates a Window and pushes it to the window vector.
+   * @param cfg - The configuration of the Window.
+   * @return A pointer to the Window.
+   */
+  Window* createWindow(const WindowConfig& cfg);
+  
+  static void handleWindowClose(GLFWwindow* window);
 
   friend class Scene;
 };

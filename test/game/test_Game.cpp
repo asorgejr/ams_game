@@ -51,18 +51,18 @@ public:
   bool testWasEnabled = false;
   bool testWasDisabled = false;
   bool testWasStarted = false;
-  void onEnable() override { testWasEnabled = true; }
-  void onDisable() override { testWasDisabled = true; }
+  void onEnable() override {
+    testWasEnabled = true;
+  }
+  void onDisable() override {
+    testWasDisabled = true;
+  }
   void onStart() override {
     testWasStarted = true;
     _app = Application::getInstance();
   }
   void onUpdate() override {
     testUpdate++;
-    // if (duration_cast<milliseconds>(clk_t::now() - _start).count() > 1000) {
-    //   _app->stop(); // TODO: this causes SEH exception. For loop iterator in Scene::onUpdate gets corrupted.
-    // }
-    std::cout << "time: " << duration_cast<milliseconds>(clk_t::now() - _start).count() << std::endl;
   }
 };
 
@@ -108,7 +108,17 @@ TEST(Game, AppGetScene) {
   Application app;
   auto* pScene = app.createScene("TestScene");
   EXPECT_EQ(app.getScene("TestScene"), pScene);
+#ifdef AMS_EXCEPTIONS
   EXPECT_ANY_THROW(app.getScene("TestScene2"));
+#else
+  EXPECT_EQ(app.getScene("TestScene2"), nullptr);
+#endif
+}
+
+TEST(Game, AppWindow) {
+  Application app;
+  EXPECT_NE(app.getWindow(), nullptr);
+  app.exit();
 }
 
 TEST(Game, SceneCreateEntity) {
@@ -133,12 +143,37 @@ TEST(Game, EntityAddComponent) {
   auto* pEntity = pScene->createEntity();
   auto* pComp = pEntity->addComponent<TestBehaviorVirtMethods>();
   app.setCurrentScene(pScene->getName());
+  app.setVsyncTime(65);
   app.run();
   
   EXPECT_NE(pComp, nullptr);
   EXPECT_EQ(pComp->getName(), "Object_" + to_string(pComp->getId()));
   EXPECT_EQ(pComp->testWasEnabled, true);
   EXPECT_EQ(pComp->testWasStarted, true);
-  // EXPECT_GT(pComp->testUpdate, 60);
+  EXPECT_GT(pComp->testUpdate, 60);
+  app.exit();
+}
+
+TEST(Game, 100EntitiesAddComponentPerfTest) {
+  TestApplication app("TestApp", 1000ms);
+  auto* pScene = app.createScene("TestScene");
+  std::vector<ams::Entity*> entities;
+  for (int i = 0; i < 100; i++) {
+    auto* pEntity = pScene->createEntity();
+    pEntity->addComponent<TestBehaviorVirtMethods>();
+    entities.push_back(pEntity);
+  }
+  app.setCurrentScene(pScene->getName());
+  app.setVsyncTime(65);
+  app.run();
+  
+  for (auto& pEntity : entities) {
+    auto* pComp = pEntity->getComponent<TestBehaviorVirtMethods>();
+    EXPECT_NE(pComp, nullptr);
+    EXPECT_EQ(pComp->getName(), "Object_" + to_string(pComp->getId()));
+    EXPECT_EQ(pComp->testWasEnabled, true);
+    EXPECT_EQ(pComp->testWasStarted, true);
+    EXPECT_GT(pComp->testUpdate, 60);
+  }
   app.exit();
 }

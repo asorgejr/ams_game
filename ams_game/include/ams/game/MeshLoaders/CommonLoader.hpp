@@ -15,44 +15,42 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*[export module ams.game.Object]*/
+/*[export module ams.game.MeshLoaders.CommonLoader]*/
 /*[exclude begin]*/
 #pragma once
-#include "ams_game_export.hpp"
-#include "ams/game/Exceptions.hpp"
+#include "ams/game/Mesh.hpp"
 /*[exclude end]*/
-/*[export]*/ #include <string>
-#include <random>
-/*[export import ams.game.Exceptions]*/
-
-/*[export]*/ using std::string;
+/*[import ams.game.Mesh]*/
 
 /*[export]*/ namespace ams {
 
-using uuid_t = uint64_t;
-
 /**
- * @brief The Object class is the base class for all objects in the game engine.
- * @details The Object class is the base class for all objects in the game engine.
- * It stores the a name and a unique identifier.
+ * @brief CommonLoader supports loading static meshes from any filetype supported by Assimp.
+ * @details Supported filetypes are:
+ * Autodesk ( .fbx ),
+ * Collada ( .dae ),
+ * glTF ( .gltf, .glb ),
+ * Blender 3D ( .blend ),
+ * 3ds Max 3DS ( .3ds ),
+ * 3ds Max ASE ( .ase ),
+ * Wavefront Object ( .obj ),
+ * Industry Foundation Classes (IFC/Step) ( .ifc ),
+ * XGL ( .xgl,.zgl ),
+ * Stanford Polygon Library ( .ply ),
+ * LightWave ( .lwo ),
+ * LightWave Scene ( .lws ),
+ * Modo ( .lxo ),
+ * Stereolithography ( .stl ),
+ * DirectX X ( .x ),
+ * AC3D ( .ac ),
+ * Milkshape 3D ( .ms3d ),
+ * TrueSpace ( .cob,.scn ),
  */
-class AMS_GAME_EXPORT Object {
-protected:
-  const uuid_t id;
-  std::string name;
+class CommonLoader : public IMeshLoader {
 public:
-  Object() : id(dis(gen)) {
-    name = "Object_" + std::to_string(id);
-  }
-  explicit Object(const std::string& name) : id(dis(gen)), name(name) {}
-
-  [[nodiscard]] const uuid_t& getId() const { return id; }
-  [[nodiscard]] const std::string& getName() const { return name; }
-  
-private:
-  inline static std::random_device rd{};
-  inline static std::mt19937 gen{rd()};
-  inline static std::uniform_int_distribution<uint64_t> dis{};
+  CommonLoader() = default;
+  ~CommonLoader() = default;
+  Mesh load(const std::filesystem::path& path) const override;
 };
 
 } // ams

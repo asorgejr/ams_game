@@ -38,14 +38,15 @@ struct Vec2 {
   T x, y;
 
   constexpr Vec2() : x(0), y(0) {}
-
-  constexpr explicit Vec2(T x) : x(x), y(x) {}
+  
+  // Implicit conversion from underlying type is allowed
+  constexpr Vec2(T x) : x(x), y(x) {}
 
   constexpr Vec2(T x, T y) : x(x), y(y) {}
 
   constexpr Vec2(const Vec2& v) : x(v.x), y(v.y) {}
 
-  template<Vec2T V2T> constexpr explicit Vec2(const V2T& v) : x(v.x), y(v.y) {}
+  template<Vec2T V2T> constexpr Vec2(const V2T& v) : x(v.x), y(v.y) {}
 
 #pragma region operators
 
@@ -55,8 +56,14 @@ struct Vec2 {
       if (i < 0 || i > 1) throw std::out_of_range("Vec2 subscript out of range");
     return (&x)[i];
   }
-
+  
   // copy assignment operator
+  constexpr Vec2<T>& operator=(const Vec2<T>& v) {
+    x = v.x;
+    y = v.y;
+    return *this;
+  }
+  
   template<Vec2T V2T> Vec2<T>& operator=(const V2T& v) {
     x = v.x;
     y = v.y;

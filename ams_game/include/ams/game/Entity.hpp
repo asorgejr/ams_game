@@ -16,13 +16,14 @@
  */
 /*[module]*/
 
-/*[ignore begin]*/
-#include "ams_game_export.hpp"
-/*[ignore end]*/
-
 /*[export module ams.game.Entity]*/
 /*[exclude begin]*/
 #pragma once
+/*[exclude end]*/
+/*[ignore begin]*/
+#include "ams_game_export.hpp"
+/*[ignore end]*/
+/*[exclude begin]*/
 #include "internal/CallbackList.hpp"
 #include "Object.hpp"
 #include "Transform.hpp"

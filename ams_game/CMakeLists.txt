@@ -1,6 +1,7 @@
 set(COMPONENT_NAME game)
 
 find_package(OpenGL REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 
 if (ENABLE_MODULES)
@@ -62,8 +63,9 @@ target_link_libraries(${COMPONENT_NAME}
     spatial
     OpenGL::GL
     glfw
+  PRIVATE
+    assimp::assimp
 )
-
 
 #### INSTALLATION ####
 

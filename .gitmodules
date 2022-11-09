@@ -4,6 +4,6 @@
 [submodule "ams_core/third_party/gcem"]
 	path = ams_core/third_party/gcem
 	url = https://github.com/kthohr/gcem.git
-[submodule "ams_spatial/third_party/eigen"]
-	path = ams_spatial/third_party/eigen
-	url = https://gitlab.com/libeigen/eigen.git
+[submodule "util/third_party/argparse"]
+	path = util/third_party/argparse
+	url = https://github.com/p-ranav/argparse.git

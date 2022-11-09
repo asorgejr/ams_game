@@ -46,7 +46,9 @@ struct Vec3 {
 
   constexpr explicit Vec3(const Vec2<T>& v) : x(v.x), y(v.y), z(0) {}
 
-  template<Vec3T V3T> constexpr explicit Vec3(const V3T& v) : x(v.x), y(v.y), z(v.z) {}
+  template<Vec3T V3T> constexpr Vec3(const V3T& v) : x(v.x), y(v.y), z(v.z) {}
+  
+  template<Vec2T V2T> constexpr Vec3(const V2T& v, T z) : x(v.x), y(v.y), z(z) {}
 
 #pragma region operators
 
@@ -56,9 +58,24 @@ struct Vec3 {
       if (i < 0 || i > 2) throw std::out_of_range("Vec3 subscript out of range");
     return (&x)[i];
   }
+  
+  constexpr Vec3<T>& operator=(const Vec3<T>& v) {
+    x = v.x;
+    y = v.y;
+    z = v.z;
+    return *this;
+  }
 
   // copy assignment operator
   template<Vec3T V3T> Vec3<T>& operator=(const V3T& v) {
+    x = v.x;
+    y = v.y;
+    z = v.z;
+    return *this;
+  }
+  
+  // const copy assignment operator
+  template<Vec3T V3T> Vec3<T>& operator=(const V3T& v) const {
     x = v.x;
     y = v.y;
     z = v.z;
