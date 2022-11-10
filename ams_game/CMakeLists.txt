@@ -2,7 +2,22 @@ set(COMPONENT_NAME game)
 
 find_package(OpenGL REQUIRED)
 find_package(assimp CONFIG REQUIRED)
+find_package(Vulkan 1.3)
 
+
+option(AMS_REQUIRE_OPENGL "Require OpenGL" OFF)
+option(AMS_REQUIRE_VULKAN "Require Vulkan" OFF)
+
+if (NOT Vulkan_FOUND)
+  if (AMS_REQUIRE_VULKAN)
+    message(FATAL_ERROR "Vulkan not found")
+  else()
+    message(WARNING "Vulkan not found")
+  endif()
+  set(AMS_REQUIRE_OPENGL ON CACHE BOOL "Require OpenGL" FORCE)
+else()
+  find_path(VULKAN_HPP_INCLUDE_DIRS "vulkan/vulkan.hpp" REQUIRED)
+endif()
 
 if (ENABLE_MODULES)
   file(GLOB_RECURSE ${COMPONENT_NAME}_INCLUDES
@@ -44,6 +59,19 @@ target_include_directories(${COMPONENT_NAME}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+if (NOT AMS_REQUIRE_OPENGL AND Vulkan_FOUND)
+  target_include_directories(${COMPONENT_NAME}
+    PUBLIC
+    $<BUILD_INTERFACE:${Vulkan_INCLUDE_DIRS}>
+    $<INSTALL_INTERFACE:${Vulkan_INCLUDE_DIRS}>
+    $<BUILD_INTERFACE:${VULKAN_HPP_INCLUDE_DIRS}>
+    $<INSTALL_INTERFACE:${VULKAN_HPP_INCLUDE_DIRS}>
+  )
+  target_compile_definitions(${COMPONENT_NAME}
+    PUBLIC
+    VULKAN_HPP_NO_CONSTRUCTORS
+  )
+endif()
 target_compile_definitions(${COMPONENT_NAME} PUBLIC
   "AMS_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
   "AMS_OS_${AMS_OS}"
@@ -66,6 +94,19 @@ target_link_libraries(${COMPONENT_NAME}
   PRIVATE
     assimp::assimp
 )
+
+if (AMS_REQUIRE_OPENGL)
+  target_compile_definitions(${COMPONENT_NAME}
+    PUBLIC
+    AMS_REQUIRE_OPENGL
+  )
+elseif (AMS_REQUIRE_VULKAN)
+  target_compile_definitions(${COMPONENT_NAME}
+    PUBLIC
+    AMS_REQUIRE_VULKAN
+  )
+endif()
+
 
 #### INSTALLATION ####
 

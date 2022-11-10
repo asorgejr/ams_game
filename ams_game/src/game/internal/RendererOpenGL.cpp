@@ -14,53 +14,38 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/*[module]*/
 
-/*[ignore begin]*/
-#include "ams_game_export.hpp"
-/*[ignore end]*/
-/*[export module ams.Renderer]*/
-/*[exclude begin]*/
-#pragma once
-#include "Object.hpp"
-#include "internal/RendererBackend.hpp"
-/*[exclude end]*/
-/*[import ams.Object]*/
-/*[import ams.game.internal.RendererBackend]*/
+#ifndef AMS_MODULES
+#include "ams/game/internal/RendererOpenGL.hpp"
+#else
+import ams.game.internal.RendererOpenGL;
+#endif
 
-/*[export]*/ namespace ams {
+#include <GLFW/glfw3.h>
 
-class Application;
-class Window;
-class Scene;
+namespace ams::internal {
 
-/**
- * @brief The Renderer class is responsible for rendering the scene. 
- */
-class AMS_GAME_EXPORT Renderer : public Object {
-private:
-  Application* _application;
-  Window* _window;
-  Scene* _scene;
-  std::unique_ptr<internal::RendererBackend> _rendererImpl;
-public:
-  /**
-   * @brief Construct a new Renderer object
-   * 
-   * @param application The application that owns this renderer
-   * @param scene The scene to render
-   */
-  Renderer(Application* application, Scene* scene);
-  
-  ~Renderer();
-  
-  /**
-   * @brief Render the scene.
-   */
-  void render();
 
-  friend class Application;
-  friend class Window;
-};
+RendererOpenGL::RendererOpenGL(const ApplicationInfo& appInfo,Window* window)
+: RendererBackend(appInfo, window) {}
 
+bool RendererOpenGL::init() {
+  return RendererBackend::init();
+}
+
+void RendererOpenGL::shutdown() {
+  RendererBackend::shutdown();
+}
+
+void RendererOpenGL::beginFrame() {
+  RendererBackend::beginFrame();
+}
+
+void RendererOpenGL::endFrame() {
+  RendererBackend::endFrame();
+}
+
+void RendererOpenGL::draw() {
+  RendererBackend::draw();
+}
 } // ams

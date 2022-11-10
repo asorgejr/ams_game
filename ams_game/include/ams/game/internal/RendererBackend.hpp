@@ -14,53 +14,46 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/*[module]*/
 
-/*[ignore begin]*/
-#include "ams_game_export.hpp"
-/*[ignore end]*/
-/*[export module ams.Renderer]*/
+/*[export module ams.game.internal.IRendererImpl]*/
 /*[exclude begin]*/
 #pragma once
-#include "Object.hpp"
-#include "internal/RendererBackend.hpp"
+#include "ams/game/Object.hpp"
+#include "ams/game/ApplicationInfo.hpp"
 /*[exclude end]*/
-/*[import ams.Object]*/
-/*[import ams.game.internal.RendererBackend]*/
+/*[import ams.game.Object]*/
+/*[import ams.game.ApplicationInfo]*/
 
 /*[export]*/ namespace ams {
-
-class Application;
 class Window;
-class Scene;
 
 /**
- * @brief The Renderer class is responsible for rendering the scene. 
+ * @brief When true, Vulkan can be used as a rendering backend.
  */
-class AMS_GAME_EXPORT Renderer : public Object {
-private:
-  Application* _application;
-  Window* _window;
-  Scene* _scene;
-  std::unique_ptr<internal::RendererBackend> _rendererImpl;
-public:
-  /**
-   * @brief Construct a new Renderer object
-   * 
-   * @param application The application that owns this renderer
-   * @param scene The scene to render
-   */
-  Renderer(Application* application, Scene* scene);
-  
-  ~Renderer();
-  
-  /**
-   * @brief Render the scene.
-   */
-  void render();
+constexpr bool AMSVulkanAvailable =
+#ifndef AMS_REQUIRE_OPENGL
+  true;
+#else
+false;
+#endif
+} // namespace ams
 
-  friend class Application;
-  friend class Window;
+/*[export]*/ namespace ams::internal {
+
+class RendererBackend : public Object {
+protected:
+  ApplicationInfo applicationInfo;
+  Window* window;
+public:
+  RendererBackend(const ApplicationInfo& applicationInfo, Window* window)
+  : Object(), applicationInfo(applicationInfo), window(window) {}
+  
+  virtual ~RendererBackend() = default;
+  virtual bool init() {}
+  virtual void shutdown() {}
+  virtual void beginFrame() {}
+  virtual void endFrame() {}
+  virtual void draw() {}
 };
 
-} // ams
+} // ams::internal

@@ -13,14 +13,6 @@ target_include_directories(${UTIL_NAME}
   $<INSTALL_INTERFACE:include>
 )
 
-# symlink exe to CMAKE_SOURCE_DIR/bin
-add_custom_command(TARGET ${UTIL_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E create_symlink
-  $<TARGET_FILE:${UTIL_NAME}>
-  ${CMAKE_SOURCE_DIR}/bin/${UTIL_NAME}
-)
-
-
 set(UTIL_NAME meshpp)
 add_executable(${UTIL_NAME} ${UTIL_NAME}.cpp
   BoxComment.hpp)
@@ -34,13 +26,3 @@ target_include_directories(${UTIL_NAME}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include>
 )
-
-# symlink exe to CMAKE_SOURCE_DIR/bin
-add_custom_command(TARGET ${UTIL_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E create_symlink
-  $<TARGET_FILE:${UTIL_NAME}>
-  ${CMAKE_SOURCE_DIR}/bin/${UTIL_NAME}
-)
-
-
-

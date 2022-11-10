@@ -293,4 +293,8 @@ void Application::handleWindowClose(GLFWwindow* window) {
   }
 }
 
+ApplicationInfo Application::getInfo() const {
+  return info;
+}
+
 } // ams

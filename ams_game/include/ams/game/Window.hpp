@@ -72,7 +72,7 @@ struct WindowConfig {
 };
 
 /**
- * @brief Window manages the creation and destruction of a GLFW window.
+ * @brief Window is a c++ wrapper of a GLFW window. It manages the window and its events.
  */
 class AMS_GAME_EXPORT Window final : public Object {
 private:
@@ -461,6 +461,7 @@ private:
 #pragma endregion GLFW event handlers
   
   friend class Display;
+  friend class Renderer;
 };
 
 } // ams

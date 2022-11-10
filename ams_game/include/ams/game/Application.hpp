@@ -25,6 +25,7 @@
 /*[exclude begin]*/
 #include "config.hpp"
 #include "Object.hpp"
+#include "ApplicationInfo.hpp"
 #include "Display.hpp"
 #include "Window.hpp"
 /*[exclude end]*/
@@ -36,6 +37,7 @@
 #include <chrono>
 /*[import ams.game.config]*/
 /*[import ams.game.Object]*/
+/*[import ams.game.ApplicationInfo]*/
 /*[import ams.game.Display]*/
 /*[import ams.game.Window]*/
 
@@ -80,6 +82,8 @@ protected:
   time_unit fixedFrameTime = time_unit_1s / 60;
   /** Frame synchronization time. When this value is 0us (the default value), the game will run as fast as possible. */
   time_unit vsyncTime = time_unit_1s * 0;
+  
+  ApplicationInfo info;
   
   /** Currently loaded scenes. */
   std::vector<std::unique_ptr<Scene>> scenes;
@@ -185,6 +189,8 @@ public:
    * @brief Gets the fixed frame rate as a time duration.
    */
   time_unit getFixedFrameTime() const;
+  
+  ApplicationInfo getInfo() const;
   
   /**
    * @brief Gets the primary window.

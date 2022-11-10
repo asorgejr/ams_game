@@ -16,11 +16,42 @@
  */
 
 #ifndef AMS_MODULES
+#include "ams/game/Application.hpp"
 #include "ams/game/Renderer.hpp"
+#include "ams/game/internal/RendererOpenGL.hpp"
+#include "ams/game/internal/RendererVulkan.hpp"
 #else
 import ams.game.Renderer;
+import ams.game.internal.RendererOpenGL;
+import ams.game.internal.RendererVulkan;
 #endif
 
+using namespace ams::internal;
+
 namespace ams {
+
+Renderer::Renderer(Application* application, Scene* scene) {
+  _application = application;
+  _scene = scene;
+  _rendererImpl = nullptr;
+  #ifndef AMS_REQUIRE_OPENGL
+  _rendererImpl = std::make_unique<RendererVulkan>(application->getInfo(), application->getWindow());
+  #else
+  _rendererImpl = std::make_unique<RendererOpenGL>(application->getInfo(), application->getWindow());
+  #endif
+  if (!_rendererImpl) {
+    throw std::runtime_error("Failed to create renderer backend");
+  }
+  _rendererImpl->init();
+}
+
+Renderer::~Renderer() {
+  if (_rendererImpl)
+    _rendererImpl->shutdown();
+}
+
+void Renderer::render() {
+
+}
 
 } // ams

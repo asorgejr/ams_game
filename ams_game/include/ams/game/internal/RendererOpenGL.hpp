@@ -14,53 +14,34 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
 /*[module]*/
 
 /*[ignore begin]*/
 #include "ams_game_export.hpp"
 /*[ignore end]*/
-/*[export module ams.Renderer]*/
+/*[export module ams.RendererOpenGL]*/
 /*[exclude begin]*/
 #pragma once
-#include "Object.hpp"
-#include "internal/RendererBackend.hpp"
+#include "RendererBackend.hpp"
 /*[exclude end]*/
-/*[import ams.Object]*/
 /*[import ams.game.internal.RendererBackend]*/
 
-/*[export]*/ namespace ams {
+/*[export]*/ namespace ams::internal {
 
-class Application;
-class Window;
-class Scene;
-
-/**
- * @brief The Renderer class is responsible for rendering the scene. 
- */
-class AMS_GAME_EXPORT Renderer : public Object {
-private:
-  Application* _application;
-  Window* _window;
-  Scene* _scene;
-  std::unique_ptr<internal::RendererBackend> _rendererImpl;
+class AMS_GAME_EXPORT RendererOpenGL : public RendererBackend {
 public:
-  /**
-   * @brief Construct a new Renderer object
-   * 
-   * @param application The application that owns this renderer
-   * @param scene The scene to render
-   */
-  Renderer(Application* application, Scene* scene);
-  
-  ~Renderer();
-  
-  /**
-   * @brief Render the scene.
-   */
-  void render();
+  RendererOpenGL(const ApplicationInfo& appInfo, Window* window);
 
-  friend class Application;
-  friend class Window;
+  bool init() override;
+
+  void shutdown() override;
+
+  void beginFrame() override;
+
+  void endFrame() override;
+
+  void draw() override;
 };
 
 } // ams

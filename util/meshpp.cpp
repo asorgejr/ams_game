@@ -110,8 +110,8 @@ tuple<int,bool,int,int> findMeshDeclarationPos(const string& str, const string& 
   smatch meshMatch;
   int pos = -1;
   bool isDefined = false;
-  bool defStartPos = -1;
-  bool defEndPos = -1;
+  int defStartPos = -1;
+  int defEndPos = -1;
   if (end == -1) {
     end = str.length();
   }
