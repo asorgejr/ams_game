@@ -67,6 +67,8 @@ concept TExcception = std::is_base_of_v<std::exception, T>;
 template<typename T>
 concept TDefaultConstructible = std::is_default_constructible_v<T> || std::is_void_v<T>;
 }
+
+
 /**
  * @brief If AMSExceptions is enabled, throws an exception, otherwise returns a default constructed value.
  * @tparam TEx - The exception type.
@@ -75,12 +77,23 @@ concept TDefaultConstructible = std::is_default_constructible_v<T> || std::is_vo
  * @return The default value if exceptions are disabled, otherwise throws an exception.
  */
 template<internal::TExcception TEx, internal::TDefaultConstructible TDefault>
-TDefault throwOrDefault(const std::string& errmsg) {
+TDefault throwOrDefault(const std::string& errmsg, TDefault def = TDefault()) {
   if constexpr (AMSExceptions)
     throw TEx(errmsg.c_str());
   else
-    return TDefault();
+    return def;
 }
 
+/**
+ * @brief If AMSExceptions is enabled, throws an exception, otherwise returns a default constructed value.
+ * @tparam TEx - The exception type.
+ * @param errmsg - The error message.
+ * @return The default value if exceptions are disabled, otherwise throws an exception.
+ */
+template<internal::TExcception TEx>
+void throwOrDefault(const std::string& errmsg) {
+  if constexpr (AMSExceptions)
+    throw TEx(errmsg.c_str());
+}
 
 } // ams

@@ -34,9 +34,16 @@ constexpr bool AMSVulkanAvailable =
 #ifndef AMS_REQUIRE_OPENGL
   true;
 #else
-false;
+  false;
 #endif
 } // namespace ams
+
+constexpr bool AMSGraphicsDebug =
+#ifdef AMS_GRAPHICS_DEBUG
+  true;
+#else
+  false;
+#endif
 
 /*[export]*/ namespace ams::internal {
 
@@ -49,7 +56,7 @@ public:
   : Object(), applicationInfo(applicationInfo), window(window) {}
   
   virtual ~RendererBackend() = default;
-  virtual bool init() {}
+  virtual bool init() { return true; }
   virtual void shutdown() {}
   virtual void beginFrame() {}
   virtual void endFrame() {}

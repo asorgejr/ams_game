@@ -73,6 +73,14 @@ TEST(Game, Application) {
   EXPECT_EQ(app.getCurrentScene()->getName(), "Application_default_" + to_string(app.getId()));
 }
 
+TEST(Game, ApplicationStaticInstnaceDestroyed) {
+  if (AMSExceptions) {
+    EXPECT_THROW(Application::getInstance(), NullPointerException);
+  } else {
+    EXPECT_EQ(Application::getInstance(), nullptr);
+  }
+}
+
 TEST(Game, AppInitScene) {
   Application app;
   auto* pScene = app.createScene("TestScene");

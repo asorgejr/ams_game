@@ -192,7 +192,7 @@ void Mesh::saveToFile(const Mesh& mesh, const std::filesystem::path& path, bool 
     // try to create file
     file.open(path, std::ios::out | std::ios::binary | std::ios::trunc);
     if (!file.is_open()) {
-      return throwOrDefault<std::runtime_error, void>("Could not open file " + path.string());
+      return throwOrDefault<std::runtime_error>("Could not open file " + path.string());
     }
   }
   

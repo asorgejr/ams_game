@@ -20,11 +20,13 @@
 #include "ams/game/Scene.hpp"
 #include "ams/game/Util.hpp"
 #include "ams/game/MeshLoaders.hpp"
+#include "ams/game/Renderer.hpp"
 #else
 import ams.game.Application;
 import ams.game.Scene;
 import ams.game.Util;
 import ams.game.MeshLoaders;
+import ams.game.Renderer;
 #endif
 #include <thread>
 #include <iostream>
@@ -45,23 +47,30 @@ Vec2<int> calcDisplayWindowCenter(const Display& disp, const Vec2<int>& winSize)
 
 Application::Application(const std::string& name, const WindowConfig& cfg)
 : Object(name),
-_windowConfig(cfg)
+  _windowConfig(cfg),
+  info {
+    .name = name,
+    .version=CompressVersion(0, 1, 0, 0),
+    .engineName="ams",
+    .engineVersion=CompressVersion(0, 1, 0, 0),
+    .apiVersion=CompressVersion(0, 1, 0, 0)
+  }
 {
   assert(glfwInit() == GLFW_TRUE);
 
   if (_instance != nullptr) {
-    throwOrDefault<std::runtime_error, void>("Application already exists");
+    throwOrDefault<std::runtime_error>("Application already exists");
     delete _instance;
   }
   _instance = this;
   _displays = Display::getDisplays();
   if (_displays.size() == 0) {
-    throwOrDefault<std::runtime_error, void>("No displays found");
+    throwOrDefault<std::runtime_error>("No displays found");
     delete _instance;
   }
   auto* win = createWindow(_windowConfig);
   if (win == nullptr) {
-    throwOrDefault<std::runtime_error, void>("Failed to create window");
+    throwOrDefault<std::runtime_error>("Failed to create window");
     delete _instance;
     return;
   }
@@ -70,6 +79,7 @@ _windowConfig(cfg)
     _instance->stop();
   }});
   _currentScene = getDefaultScene();
+  renderer = std::make_unique<Renderer>(this);
 }
 
 Application::~Application() {
@@ -140,9 +150,8 @@ time_unit Application::getDeltaTime() const {
 }
 
 Application* Application::getInstance() {
-  if constexpr(AMSExceptions)
-    if (_instance == nullptr)
-      throw NullPointerException("An instance of Application has not been created");
+  if (_instance == nullptr)
+    return throwOrDefault<NullPointerException, Application*>("An instance of Application has not been created", nullptr);
   return _instance;
 }
 
@@ -247,7 +256,7 @@ Window* Application::getWindow() {
     }
     return nullptr;
   }
-  return _windows[0].get();
+  return _windows.front().get();
 }
 
 void Application::setVsyncTime(float vsyncFPS) {
@@ -267,13 +276,33 @@ Window* Application::getWindow(GLFWwindow* window) {
   return nullptr;
 }
 
+bool Application::registerOnSceneChangeCallback(const Function<void, ams::Scene*, ams::Scene*>& callback) {
+  bool result = std::find_if(_onSceneChangeListeners.begin(), _onSceneChangeListeners.end(), [&](const auto& cb) {
+    return cb == callback;
+  }) == _onSceneChangeListeners.end();
+  if (result)
+    _onSceneChangeListeners.push_back(callback);
+  return result;
+}
+
+bool Application::unregisterOnSceneChangeCallback(const Function<void, ams::Scene*, ams::Scene*>& callback) {
+  auto it = std::find_if(_onSceneChangeListeners.begin(), _onSceneChangeListeners.end(), [&](const auto& cb) {
+    return cb == callback;
+  });
+  if (it != _onSceneChangeListeners.end()) {
+    _onSceneChangeListeners.erase(it);
+    return true;
+  }
+  return false;
+}
+
 Window* Application::createWindow(const WindowConfig& cfg) {
-  _windows.push_back(std::make_unique<Window>(_displays[0], _windowConfig));
+  _windows.push_back(std::make_unique<Window>(_displays.front(), _windowConfig));
   auto* win = _windows[_windows.size()-1].get();
   if (win == nullptr)
     return win; // errors handled in App constructor.
   if (!_windowConfig.fullscreen) {
-    win->setPosition(calcDisplayWindowCenter(_displays[0], _windowConfig.size));
+    win->setPosition(calcDisplayWindowCenter(_displays.front(), _windowConfig.size));
   }
   return win;
 }
@@ -298,3 +327,4 @@ ApplicationInfo Application::getInfo() const {
 }
 
 } // ams
+

@@ -7,6 +7,7 @@ find_package(Vulkan 1.3)
 
 option(AMS_REQUIRE_OPENGL "Require OpenGL" OFF)
 option(AMS_REQUIRE_VULKAN "Require Vulkan" OFF)
+option(AMS_GRAPHICS_DEBUG "Enable graphics debug" OFF)
 
 if (NOT Vulkan_FOUND)
   if (AMS_REQUIRE_VULKAN)
@@ -106,6 +107,13 @@ elseif (AMS_REQUIRE_VULKAN)
     AMS_REQUIRE_VULKAN
   )
 endif()
+if (AMS_GRAPHICS_DEBUG)
+  target_compile_definitions(${COMPONENT_NAME}
+    PUBLIC
+      AMS_GRAPHICS_DEBUG
+)
+endif()
+
 
 
 #### INSTALLATION ####

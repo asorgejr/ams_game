@@ -69,6 +69,8 @@ private:
   Scene* _currentScene;
   std::vector<Display> _displays;
   const WindowConfig _windowConfig = kDefaultWindowConfig;
+  std::vector<Function<void, Scene*, Scene*>> _onSceneChangeListeners;
+  
 protected:
   /** Determines if the game loop should continue. */
   std::atomic_bool running = false;
@@ -87,6 +89,8 @@ protected:
   
   /** Currently loaded scenes. */
   std::vector<std::unique_ptr<Scene>> scenes;
+  
+  std::unique_ptr<Renderer> renderer;
   
 public:
   Application(const std::string& name="Application", const WindowConfig& cfg=kDefaultWindowConfig);
@@ -203,6 +207,20 @@ public:
    * @return Window* if the window is associated with the application, nullptr otherwise.
    */
   static Window* getWindow(GLFWwindow* window);
+  
+  /**
+   * @brief Registers a listener to be called when the scene changes.
+   * @param callback - The function to call when the scene changes.
+   * @return true if the listener was added, false otherwise.
+   */
+  bool registerOnSceneChangeCallback(const Function<void, Scene*, Scene*>& callback);
+  
+  /**
+   * @brief Unregisters a listener to be called when the scene changes.
+   * @param callback - The function to call when the scene changes.
+   * @return true if the listener was removed, false otherwise.
+   */
+  bool unregisterOnSceneChangeCallback(const Function<void, Scene*, Scene*>& callback);
   
 protected:
   /**

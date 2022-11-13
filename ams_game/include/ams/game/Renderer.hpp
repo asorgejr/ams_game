@@ -22,10 +22,12 @@
 /*[export module ams.Renderer]*/
 /*[exclude begin]*/
 #pragma once
+#include <ams/Function.hpp>
 #include "Object.hpp"
 #include "internal/RendererBackend.hpp"
 /*[exclude end]*/
-/*[import ams.Object]*/
+/*[import ams.Function]*/
+/*[import ams.game.Object]*/
 /*[import ams.game.internal.RendererBackend]*/
 
 /*[export]*/ namespace ams {
@@ -37,12 +39,13 @@ class Scene;
 /**
  * @brief The Renderer class is responsible for rendering the scene. 
  */
-class AMS_GAME_EXPORT Renderer : public Object {
+class AMS_GAME_EXPORT Renderer final : public Object {
 private:
   Application* _application;
   Window* _window;
   Scene* _scene;
   std::unique_ptr<internal::RendererBackend> _rendererImpl;
+  Function<void,Scene*,Scene*> _sceneChangeCallback;
 public:
   /**
    * @brief Construct a new Renderer object
@@ -50,7 +53,7 @@ public:
    * @param application The application that owns this renderer
    * @param scene The scene to render
    */
-  Renderer(Application* application, Scene* scene);
+  Renderer(Application* application);
   
   ~Renderer();
   
@@ -58,6 +61,7 @@ public:
    * @brief Render the scene.
    */
   void render();
+
 
   friend class Application;
   friend class Window;

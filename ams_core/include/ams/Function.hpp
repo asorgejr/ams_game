@@ -51,7 +51,7 @@ private:
 public:
   Function() = default;
   
-  Function(const std::function<Tr(Tp...)>& function) : _function(function) {
+  explicit Function(const std::function<Tr(Tp...)>& function) : _function(function) {
     _id = _dis(_gen);
   }
   

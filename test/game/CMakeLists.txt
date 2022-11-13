@@ -8,7 +8,7 @@ add_test_module(NAME test_game
   "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
   "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
   "$<INSTALL_INTERFACE:include>"
-  )
+)
 
 add_test_module(NAME test_Mesh
   SOURCES

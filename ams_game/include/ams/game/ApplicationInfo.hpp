@@ -15,6 +15,12 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/*[module]*/
+
+/*[ignore begin]*/
+#include "ams_game_export.hpp"
+/*[ignore end]*/
+
 /*[export module ams.game.ApplicationInfo]*/
 /*[exclude begin]*/
 #pragma once
@@ -33,7 +39,7 @@
  * @param minor - The minor version number (bits 12-21) (10 bits)
  * @param patch - The patch version number (bits 0-11) (12 bits)
  */
-constexpr uint32_t CompressVersion(uint32_t variant, uint32_t major, uint32_t minor, uint32_t patch) {
+inline constexpr uint32_t CompressVersion(uint32_t variant, uint32_t major, uint32_t minor, uint32_t patch) {
   if (variant > 7)  throw std::invalid_argument("Variant must be less than 8.");
   if (major > 127)  throw std::invalid_argument("Major must be less than 128.");
   if (minor > 1023) throw std::invalid_argument("Minor must be less than 1024.");
@@ -45,7 +51,7 @@ constexpr uint32_t CompressVersion(uint32_t variant, uint32_t major, uint32_t mi
  * @brief Compress a string version number into a single integer.
  * @param version - The version string to compress.
  */
-constexpr uint32_t CompressVersion(const std::string& version) {
+inline uint32_t CompressVersion(const std::string& version) {
   uint32_t variant = 0;
   uint32_t major = 0;
   uint32_t minor = 0;
@@ -59,7 +65,7 @@ constexpr uint32_t CompressVersion(const std::string& version) {
  * @param version - The version number to decompress. Variant is bits 29-31, major is bits 22-28, minor is bits 12-21, and patch is bits 0-11.
  * @return - (variant, major, minor, patch)
  */
-constexpr std::tuple<uint32_t, uint32_t, uint32_t, uint32_t>
+inline constexpr std::tuple<uint32_t, uint32_t, uint32_t, uint32_t>
 DecompressVersion(uint32_t version) {
   return std::make_tuple((version >> 29) & 0x7, (version >> 22) & 0x7F, (version >> 12) & 0x3FF, version & 0xFFF);
 }
@@ -67,27 +73,27 @@ DecompressVersion(uint32_t version) {
 /**
  * @brief Application information.
  */
-struct ApplicationInfo {
+struct AMS_GAME_EXPORT ApplicationInfo {
   /**
    * @brief The name of the application.
    */
-  const std::string name;
+  const std::string name{};
   /**
    * @brief The version of the application. Use the ams::CompressVersion function to create this value.
    */
-  const uint32_t version;
+  const uint32_t version = CompressVersion(0, 1, 0, 0);
   /**
    * @brief The name of the engine.
    */
-  const std::string engineName;
+  const std::string engineName{};
   /**
    * @brief The version of the engine. Use the ams::CompressVersion function to create this value.
    */
-  const uint32_t engineVersion;
+  const uint32_t engineVersion = CompressVersion(0, 1, 0, 0);
   /**
    * @brief The API version to use. Use the ams::CompressVersion function to create this value.
    */
-  const uint32_t apiVersion;
+  const uint32_t apiVersion = CompressVersion(0, 1, 0, 0);
 };
 
 } // ams

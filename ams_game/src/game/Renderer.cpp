@@ -21,6 +21,7 @@
 #include "ams/game/internal/RendererOpenGL.hpp"
 #include "ams/game/internal/RendererVulkan.hpp"
 #else
+import ams.game.Application;
 import ams.game.Renderer;
 import ams.game.internal.RendererOpenGL;
 import ams.game.internal.RendererVulkan;
@@ -30,12 +31,17 @@ using namespace ams::internal;
 
 namespace ams {
 
-Renderer::Renderer(Application* application, Scene* scene) {
+Renderer::Renderer(Application* application) {
   _application = application;
-  _scene = scene;
-  _rendererImpl = nullptr;
+  _scene = application->getCurrentScene();
+  _sceneChangeCallback = [this](Scene* oldScene, Scene* newScene) {
+    this->_scene = newScene;
+  };
+  _application->registerOnSceneChangeCallback(_sceneChangeCallback);
+  
   #ifndef AMS_REQUIRE_OPENGL
-  _rendererImpl = std::make_unique<RendererVulkan>(application->getInfo(), application->getWindow());
+  auto appInfo = _application->getInfo();
+  _rendererImpl = std::make_unique<RendererVulkan>(appInfo, application->getWindow());
   #else
   _rendererImpl = std::make_unique<RendererOpenGL>(application->getInfo(), application->getWindow());
   #endif
@@ -48,10 +54,13 @@ Renderer::Renderer(Application* application, Scene* scene) {
 Renderer::~Renderer() {
   if (_rendererImpl)
     _rendererImpl->shutdown();
+  _application->unregisterOnSceneChangeCallback(_sceneChangeCallback);
 }
 
 void Renderer::render() {
-
+  _rendererImpl->beginFrame();
+  _rendererImpl->draw();
+  _rendererImpl->endFrame();
 }
 
 } // ams
