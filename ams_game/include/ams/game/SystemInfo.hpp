@@ -15,21 +15,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /*[module]*/
-/*[export module ams.game.Platform]*/
+/*[ignore begin]*/
+#include "ams_game_sysinfo.hpp"
+/*[ignore end]*/
+
+/*[export module ams.game.SystemInfo]*/
 
 #include <string>
-#include <thread>
+#include <filesystem>
 
 /*[export]*/ namespace ams {
 
 enum class Platform {
-  Windows,
-  Linux,
-  MacOS,
-  Android,
-  iOS,
-  Web,
-  Unknown
+  Windows = 0x0,
+  Linux = 0x1,
+  MacOS = 0x2,
+  Android = 0x3,
+  iOS = 0x4,
+  Unknown = 0x5
 };
 
 enum class Architecture {
@@ -48,60 +51,61 @@ enum class Compiler {
 };
 
 struct SystemInfo {
-  const Platform os;
-  const std::string os_version;
-  const Architecture architecture;
-  const Compiler compiler;
-  const std::string compiler_version;
-  const int cpu_count;
-} const System {
-.os=
+  static constexpr Platform os{
 #if defined(AMS_OS_WINDOWS)
-ams::Platform::Windows,
+    ams::Platform::Windows
 #elif defined(AMS_OS_MACOS)
-ams::Platform::MacOS,
+    ams::Platform::MacOS
 #elif defined(AMS_OS_LINUX)
-  ams::Platform::Linux,
+  ams::Platform::Linux
 #elif defined(AMS_OS_ANDROID)
-  ams::Platform::Android,
+    ams::Platform::Android
 #elif defined(AMS_OS_IOS)
-  ams::Platform::iOS,
+  ams::Platform::iOS
 #elif defined(AMS_OS_WEB)
-  ams::Platform::Web,
+    ams::Platform::Web
 #else
-  ams::Platform::Unknown,
+  ams::Platform::Unknown
 #endif
-
-.os_version=AMS_OS_VERSION,
-
-.architecture=
+  };
+  
+  inline static const std::string osVersion = AMS_OS_VERSION;
+  static constexpr Architecture architecture {
 #if defined(AMS_ARCH_X86)
-ams::Architecture::x86,
+  ams::Architecture::x86
 #elif defined(AMS_ARCH_X64)
-ams::Architecture::x64,
+  ams::Architecture::x64
 #elif defined(AMS_ARCH_ARM)
-ams::Architecture::ARM,
+  ams::Architecture::ARM
 #elif defined(AMS_ARCH_ARM64)
-  ams::Architecture::ARM64,
+  ams::Architecture::ARM64
 #else
-  ams::Architecture::Unknown,
+  ams::Architecture::Unknown
 #endif
-
-.compiler=
+  };
+  static constexpr Compiler compiler {
 #if defined(AMS_COMPILER_MSVC)
-ams::Compiler::MSVC,
+  ams::Compiler::MSVC,
 #elif defined(AMS_COMPILER_CLANG) || defined(AMS_COMPILER_APPLECLANG)
-ams::Compiler::Clang,
+  ams::Compiler::Clang,
 #elif defined(AMS_COMPILER_GNU) || defined(AMS_COMPILER_GCC)
   ams::Compiler::GCC,
 #else
   ams::Compiler::Unknown,
 #endif
+  };
+  inline static const std::string compilerVersion = AMS_COMPILER_VERSION;
+  
+  /** 
+   * This value is generated at build time and is not guaranteed to be accurate.
+   * Prefer to use std::thread::hardware_concurrency() instead.
+   */
+  static constexpr int cpuCount = AMS_CPU_COUNT;
+  
+  static const std::filesystem::path localDataDirectory;
 
-.compiler_version=AMS_COMPILER_VERSION,
-
-.cpu_count=static_cast<int>(std::thread::hardware_concurrency())
 };
+
 
 } // ams
 

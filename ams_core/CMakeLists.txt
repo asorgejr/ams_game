@@ -1,14 +1,15 @@
 set(COMPONENT_NAME core)
 
-
+if(AMS_ENABLE_BOOST)
 find_package(Boost 1.75 REQUIRED)
+endif()
 
 add_subdirectory(third_party)
 
 file(GLOB_RECURSE ${COMPONENT_NAME}_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
-if (ENABLE_MODULES)
+if (AMS_ENABLE_MODULES)
   file(GLOB_RECURSE ${COMPONENT_NAME}_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/modules/*.cppm
   )
@@ -28,13 +29,19 @@ set_target_properties(${COMPONENT_NAME}
     LINKER_LANGUAGE CXX
     VERSION ${${PROJECT_NAME}_VERSION}
 )
-target_link_libraries(${COMPONENT_NAME}
-  PUBLIC
-    Boost::boost
+target_link_libraries(${COMPONENT_NAME} PUBLIC
     gcem
 )
+if (AMS_ENABLE_BOOST)
+  target_link_libraries(${COMPONENT_NAME} PUBLIC
+    Boost::boost
+  )
+  target_compile_definitions(${COMPONENT_NAME} PUBLIC
+    AMS_ENABLE_BOOST
+  )
+endif()
 
-if(ENABLE_MODULES)
+if(AMS_ENABLE_MODULES)
   set(MODULES_LIST " ")
   files_to_interface(VAR MODULES_LIST
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/modules
@@ -65,7 +72,7 @@ target_include_directories(${COMPONENT_NAME}
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-if (ENABLE_MODULES)
+if (AMS_ENABLE_MODULES)
   if(GNU OR CLANG)
     if(AMS_COMPILER_VERSION LESS 12)
       target_compile_options(${COMPONENT_NAME} PUBLIC -fmodules-ts)

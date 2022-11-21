@@ -17,17 +17,20 @@
 
 #ifndef AMS_MODULES
 #include "ams/game/Application.hpp"
+#include "ams/game/SystemInfo.hpp"
 #include "ams/game/Scene.hpp"
 #include "ams/game/Util.hpp"
 #include "ams/game/MeshLoaders.hpp"
 #include "ams/game/Renderer.hpp"
 #else
 import ams.game.Application;
+import ams.game.SystemInfo;
 import ams.game.Scene;
 import ams.game.Util;
 import ams.game.MeshLoaders;
 import ams.game.Renderer;
 #endif
+#include <cstdlib>
 #include <thread>
 #include <iostream>
 #include <cassert>
@@ -35,8 +38,10 @@ import ams.game.Renderer;
 #include <GLFW/glfw3.h>
 
 using namespace std::chrono;
+namespace fs = std::filesystem;
 
 namespace ams {
+
 
 constexpr auto tu0s = time_unit_1s * 0;
 
@@ -45,36 +50,37 @@ Vec2<int> calcDisplayWindowCenter(const Display& disp, const Vec2<int>& winSize)
   return Vec2<int>(dispSize.x / 2 - winSize.x / 2, dispSize.y / 2 - winSize.y / 2);
 }
 
-Application::Application(const std::string& name, const WindowConfig& cfg)
-: Object(name),
+Application::Application(const ApplicationInfo& appinfo, const WindowConfig& cfg)
+: Object(appinfo.name),
   _windowConfig(cfg),
-  info {
-    .name = name,
-    .version=CompressVersion(0, 1, 0, 0),
-    .engineName="ams",
-    .engineVersion=CompressVersion(0, 1, 0, 0),
-    .apiVersion=CompressVersion(0, 1, 0, 0)
-  }
+  info(appinfo),
+  appDataDir(SystemInfo::localDataDirectory / name)
 {
   assert(glfwInit() == GLFW_TRUE);
 
   if (_instance != nullptr) {
-    throwOrDefault<std::runtime_error>("Application already exists");
+    throwOrDefault<Exception>("Application already exists");
     delete _instance;
   }
   _instance = this;
+  if (!fs::exists(appDataDir)) {
+    fs::create_directories(appDataDir);
+  } else if (!fs::is_directory(appDataDir)) {
+    throwOrDefault<Exception>("Application data directory is not a directory");
+  }
+  Logger::initialize(this);
   _displays = Display::getDisplays();
   if (_displays.size() == 0) {
-    throwOrDefault<std::runtime_error>("No displays found");
+    throwOrDefault<Exception>("No displays found");
     delete _instance;
   }
   auto* win = createWindow(_windowConfig);
   if (win == nullptr) {
-    throwOrDefault<std::runtime_error>("Failed to create window");
+    throwOrDefault<Exception>("Failed to create window");
     delete _instance;
     return;
   }
-  
+
   win->registerWindowCloseCallback({[&]() {
     _instance->stop();
   }});
@@ -82,12 +88,17 @@ Application::Application(const std::string& name, const WindowConfig& cfg)
   renderer = std::make_unique<Renderer>(this);
 }
 
+Application::Application(const std::string& name, const WindowConfig& cfg)
+: Application(ApplicationInfo{.name=name}, cfg)
+{}
+
 Application::~Application() {
   if (_instance == this) {
     _instance = nullptr;
   }
   _windows.clear();
   glfwTerminate();
+  Logger::destroy();
 }
 
 Scene* Application::getCurrentScene() const {
@@ -120,7 +131,7 @@ Scene* Application::getScene(const std::string& name) const {
   bool result = tryGetScene(name, ret);
   if constexpr (AMSExceptions) {
     if (!result)
-      throw std::runtime_error("Scene not found");
+      throw ArgumentException("Scene not found");
   }
   return ret;
 }
@@ -129,7 +140,7 @@ Scene* Application::createScene(const std::string& name) {
   for (auto& upScene : scenes) {
     if (upScene->getName() == name) {
       if constexpr (AMSExceptions) {
-        throw std::runtime_error("Scene already exists");
+        throw ArgumentException("Scene already exists");
       }
       return upScene.get();
     }
@@ -252,7 +263,7 @@ time_unit Application::getFixedFrameTime() const {
 Window* Application::getWindow() {
   if (_windows.empty()) {
     if constexpr (AMSExceptions) {
-      throw std::runtime_error("No windows exist");
+      throw Exception("No windows exist");
     }
     return nullptr;
   }
@@ -274,6 +285,10 @@ Window* Application::getWindow(GLFWwindow* window) {
       return win.get();
   }
   return nullptr;
+}
+
+std::filesystem::path Application::getAppDataDir() const {
+  return appDataDir;
 }
 
 bool Application::registerOnSceneChangeCallback(const Function<void, ams::Scene*, ams::Scene*>& callback) {

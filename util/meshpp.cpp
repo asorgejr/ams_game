@@ -292,6 +292,10 @@ void saveToHPP(const Mesh& mesh, const fs::path& path, const string& name, const
 
 
 int main(int argc, char** argv) {
+  #ifdef AMS_UTIL_DEBUG
+  std::cout << "Debug Mode, press any key to continue..." << std::endl;
+  std::cin.get();
+  #endif
   argparse::ArgumentParser program("meshhpp");
   program.add_argument("input")
     .help("input file");
@@ -332,7 +336,7 @@ int main(int argc, char** argv) {
       outcpp = new fs::path(outcppopt.value());
   }
   if (split && !outcpp) {
-    outcpp = new fs::path(input);
+    outcpp = new fs::path(output);
     *outcpp = outcpp->replace_extension(".cpp");
   }
   

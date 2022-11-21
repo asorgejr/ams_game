@@ -23,6 +23,7 @@
 import ams.spatial.Matrix4;
 import ams.Quaternion;
 #endif
+#include <glm/mat4x4.hpp>
 
 namespace ams {
 

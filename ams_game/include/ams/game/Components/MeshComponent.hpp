@@ -14,39 +14,37 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/*[module]*/
+
 /*[exclude begin]*/
 #pragma once
 /*[exclude end]*/
-/*[export module ams.config]*/
-/*[export]*/ #include <cstdint>
-/*[export]*/ #include <cstddef>
+/*[ignore begin]*/
+#include "ams_game_export.hpp"
+/*[ignore end]*/
+/*[export module ams.game.MeshComponent]*/
+/*[exclude begin]*/
+#include "ams/game/internal/ActiveComponent.hpp"
+#include "ams/game/Mesh.hpp"
+/*[exclude end]*/
+/*[import ams.game.internal.ActiveComponent]*/
+/*[import ams.game.Mesh]*/
 
 /*[export]*/ namespace ams {
 
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
-#else
-  false;
-#endif
+class AMS_GAME_EXPORT MeshComponent : public internal::ActiveComponent {
+private:
+  const Mesh* _sharedMesh;
+  Mesh* _mesh = nullptr; // If this is not null, then the mesh is owned by this component
   
-constexpr bool AMSNegativeIndexing =
-#ifdef AMS_NEGATIVE_INDEXING
-  true;
-#else
-  false;
-#endif
+public:
+  explicit MeshComponent(Entity* entity, Mesh* mesh=nullptr);
   
-constexpr bool AMS128BitIntegers =
-#ifdef AMS_ENABLE_128BIT_INTEGERS
-  true;
-#else
-  false;
-#endif
+  ~MeshComponent() override;
 
-}
+  const Mesh* getMesh() const;
+  
+  void setMesh(Mesh* mesh);
+};
+
+} // ams

@@ -14,39 +14,25 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+// This file uses metatags to convert headers to module-interfaces using header2module.py.
+// Any block comment formatted as: /*[   ]*/ is a metatag and other code may depend on it.
+// Proceed with caution when modifying such comments.
+
 /*[exclude begin]*/
 #pragma once
 /*[exclude end]*/
-/*[export module ams.config]*/
-/*[export]*/ #include <cstdint>
-/*[export]*/ #include <cstddef>
+/*[export module ams.game.LoggerException]*/
+/*[exclude begin]*/
+#include "Exception.hpp"
+/*[exclude end]*/
+/*[import ams.game.Exception]*/
+
 
 /*[export]*/ namespace ams {
 
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMSNegativeIndexing =
-#ifdef AMS_NEGATIVE_INDEXING
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMS128BitIntegers =
-#ifdef AMS_ENABLE_128BIT_INTEGERS
-  true;
-#else
-  false;
-#endif
+class LoggerException : public Exception {
+public:
+  using Exception::Exception;
+};
 
-}
+} // ams

@@ -14,39 +14,29 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+// This file uses metatagging to convert headers to module-interfaces using header2module.py.
+// Any block comment formatted as: /*[   ]*/ is a metatag and other code may depend on it.
+// Proceed with caution when modifying such comments.
+
 /*[exclude begin]*/
 #pragma once
 /*[exclude end]*/
-/*[export module ams.config]*/
-/*[export]*/ #include <cstdint>
-/*[export]*/ #include <cstddef>
+/*[export module ams.concepts]*/
+#include <concepts>
 
-/*[export]*/ namespace ams {
 
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMSNegativeIndexing =
-#ifdef AMS_NEGATIVE_INDEXING
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMS128BitIntegers =
-#ifdef AMS_ENABLE_128BIT_INTEGERS
-  true;
-#else
-  false;
-#endif
+namespace ams {
+namespace {
 
-}
+template<template<typename...> class C, typename...Ts>
+std::true_type is_base_of_template_impl(const C<Ts...>*);
+
+template<template<typename...> class C>
+std::false_type is_base_of_template_impl(...);
+
+} // namespace internal
+
+template<typename T, template<typename...> class C>
+using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
+
+} // namespace ams

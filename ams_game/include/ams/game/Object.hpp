@@ -20,10 +20,12 @@
 #pragma once
 #include "ams_game_export.hpp"
 #include "ams/game/Exceptions.hpp"
+#include "ams/game/Logger.hpp"
 /*[exclude end]*/
 /*[export]*/ #include <string>
 #include <random>
 /*[export import ams.game.Exceptions]*/
+/*[export import ams.game.Logger]*/
 
 /*[export]*/ using std::string;
 

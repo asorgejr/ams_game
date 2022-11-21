@@ -17,36 +17,22 @@
 /*[exclude begin]*/
 #pragma once
 /*[exclude end]*/
-/*[export module ams.config]*/
-/*[export]*/ #include <cstdint>
-/*[export]*/ #include <cstddef>
+/*[export module ams.game.internal.Meshes]*/
+/*[exclude begin]*/
+#include "ams/game/Mesh.hpp"
+/*[exclude end]*/
+
+/*[import ams.game.Mesh]*/
 
 /*[export]*/ namespace ams {
+namespace internal {
 
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMSNegativeIndexing =
-#ifdef AMS_NEGATIVE_INDEXING
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMS128BitIntegers =
-#ifdef AMS_ENABLE_128BIT_INTEGERS
-  true;
-#else
-  false;
-#endif
+class Meshes {
+public:
+  static const ams::Mesh BoxMesh;
+  static const ams::Mesh SphereMesh;
+  static const ams::Mesh CapsuleMesh;
+};
 
-}
+} // ams
+} // internal

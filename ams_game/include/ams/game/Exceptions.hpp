@@ -18,9 +18,13 @@
 /*[exclude begin]*/
 #pragma once
 #include "ams/game/Exceptions/Exception.hpp"
+#include "ams/game/Exceptions/ArgumentException.hpp"
+#include "ams/game/Exceptions/LoggerException.hpp"
 #include "ams/game/Exceptions/NullPointerException.hpp"
 /*[exclude end]*/
 /*[export module ams.game.Exceptions]*/
 
 /*[export import ams.game.Exception]*/
+/*[export import ams.game.ArgumentException]*/
+/*[export import ams.game.LoggerException]*/
 /*[export import ams.game.NullPointerException]*/

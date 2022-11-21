@@ -372,12 +372,21 @@ void Mesh::saveToFile(const Mesh& mesh, const std::filesystem::path& path, bool 
   }
 }
 
-void Mesh::deserialize(const string& data) {
 
-}
-
-std::string Mesh::serialize() const {
-  return std::string();
+Mesh::normals_t Mesh::generateNormals(Mesh::vertices_t vts, Mesh::faces_t faces) {
+  normals_t normals;
+  normals.resize(vts.size());
+  for (auto& n : normals) {
+    n = normal_elem_t(0.0f);
+  }
+  for (const auto& f : faces) {
+    if (f.size() < 3) continue;
+    normal_elem_t n = normalize(cross(vts[f[1]] - vts[f[0]], vts[f[2]] - vts[f[0]]));
+    for (auto i : f) {
+      normals[i] = n;
+    }
+  }
+  return normals;
 }
 
 } // ams

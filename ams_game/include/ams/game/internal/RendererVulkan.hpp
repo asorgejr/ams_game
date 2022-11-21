@@ -59,7 +59,7 @@ public:
   bool init() override;
 
   /**
-   * @brief Handles shutdown of the renderer.
+   * @brief Handles destroy of the renderer.
    */
   void shutdown() override;
 

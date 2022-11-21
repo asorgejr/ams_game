@@ -15,18 +15,31 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*[export module ams.game.Util]*/
+/*[module]*/
 /*[exclude begin]*/
 #pragma once
+/*[exclude end]*/
+
+/*[ignore begin]*/
+#include "ams_game_export.hpp"
+#include <nameof.hpp>
+/*[ignore end]*/
+
+/*[export module ams.game.Util]*/
+#include <chrono>
+#include <format>
+#include <source_location>
+/*[exclude begin]*/
 #include <ams/Math.hpp>
 #include "config.hpp"
+#include "Logger.hpp"
 /*[exclude end]*/
-#include <chrono>
 /*[import ams.Math]*/
 /*[import ams.game.config]*/
+/*[import ams.game.Log]*/
 
 // chrono literals
-using namespace std::chrono_literals;
+/*[export]*/ using namespace std::chrono_literals;
 
 /*[export]*/ namespace ams {
 
@@ -77,11 +90,14 @@ concept TDefaultConstructible = std::is_default_constructible_v<T> || std::is_vo
  * @return The default value if exceptions are disabled, otherwise throws an exception.
  */
 template<internal::TExcception TEx, internal::TDefaultConstructible TDefault>
-TDefault throwOrDefault(const std::string& errmsg, TDefault def = TDefault()) {
-  if constexpr (AMSExceptions)
+TDefault throwOrDefault(const std::string& errmsg, TDefault def = TDefault(),
+                        const std::source_location& loc = std::source_location::current()) {
+  Logger::log(errmsg, LogLevel::Error, loc);
+  if constexpr (AMSExceptions) {
     throw TEx(errmsg.c_str());
-  else
+  } else {
     return def;
+  }
 }
 
 /**
@@ -91,9 +107,11 @@ TDefault throwOrDefault(const std::string& errmsg, TDefault def = TDefault()) {
  * @return The default value if exceptions are disabled, otherwise throws an exception.
  */
 template<internal::TExcception TEx>
-void throwOrDefault(const std::string& errmsg) {
-  if constexpr (AMSExceptions)
+void throwOrDefault(const std::string& errmsg, const std::source_location& loc = std::source_location::current()) {
+  Logger::log(errmsg, LogLevel::Error, loc);
+  if constexpr (AMSExceptions) {
     throw TEx(errmsg.c_str());
+  }
 }
 
 } // ams

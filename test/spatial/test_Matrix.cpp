@@ -14,7 +14,7 @@ import ams.spatial.Quaternion;
 namespace {
 
 
-TEST(Matrix2, Matrix2) {
+TEST(Matrix2, Matrix2Init) {
   ams::Matrix2 m;
   EXPECT_EQ(m[0][0], 0);
   EXPECT_EQ(m[0][1], 0);
@@ -206,6 +206,21 @@ TEST(Matrix3, ToQuaternion) {
   EXPECT_NEAR(q3.w, 0.7071067811865475, 1e-5);
 }
 
+TEST(Matrix3, ImplicitGLMMat3) {
+  // note: transposed to column major
+  ams::Matrix3 m(1, 2, 3, 4, 5, 6, 7, 8, 9);
+  glm::mat3 g = m;
+  EXPECT_EQ(g[0][0], 1);
+  EXPECT_EQ(g[0][1], 4);
+  EXPECT_EQ(g[0][2], 7);
+  EXPECT_EQ(g[1][0], 2);
+  EXPECT_EQ(g[1][1], 5);
+  EXPECT_EQ(g[1][2], 8);
+  EXPECT_EQ(g[2][0], 3);
+  EXPECT_EQ(g[2][1], 6);
+  EXPECT_EQ(g[2][2], 9);
+}
+
 TEST(Matrix4, Matrix4) {
   ams::Matrix4 m;
   EXPECT_EQ(m[0][0], 0);
@@ -278,6 +293,59 @@ TEST(Matrix4, MultiplyVector) {
   // EXPECT_EQ(v2[1], 618);
   // EXPECT_EQ(v2[2], 986);
   // EXPECT_EQ(v2[3], 1354);
+}
+
+TEST(Matrix4, M4Perspective) {
+  ams::Matrix4 m;
+  auto fov = ams::radians(45.0);
+  auto aspect = 1.0;
+  auto near = 0.1;
+  auto far = 100.0;
+  m.setPerspective(fov, aspect, near, far);
+  EXPECT_NEAR(m[0][0], 2.4142135623730949, 1e-5);
+  EXPECT_NEAR(m[0][1], 0.0, 1e-5);
+  EXPECT_NEAR(m[0][2], 0.0, 1e-5);
+  EXPECT_NEAR(m[0][3], 0.0, 1e-5);
+  EXPECT_NEAR(m[1][0], 0.0, 1e-5);
+  EXPECT_NEAR(m[1][1], 2.4142135623730949, 1e-5);
+  EXPECT_NEAR(m[1][2], 0.0, 1e-5);
+  EXPECT_NEAR(m[1][3], 0.0, 1e-5);
+  EXPECT_NEAR(m[2][0], 0.0, 1e-5);
+  EXPECT_NEAR(m[2][1], 0.0, 1e-5);
+  EXPECT_NEAR(m[2][2], -1.0020020009999999, 1e-5);
+  EXPECT_NEAR(m[2][3], -1.0, 1e-5);
+  EXPECT_NEAR(m[3][0], 0.0, 1e-5);
+  EXPECT_NEAR(m[3][1], 0.0, 1e-5);
+  EXPECT_NEAR(m[3][2], -0.20020020009999999, 1e-5);
+  EXPECT_NEAR(m[3][3], 0.0, 1e-5);
+  ams::Matrix4::extractPerspective(m, fov, aspect, near, far);
+  EXPECT_NEAR(fov, ams::radians(45.0), 1e-5);
+  EXPECT_NEAR(aspect, 1.0, 1e-5);
+  EXPECT_NEAR(near, 0.1, 1e-5);
+  EXPECT_NEAR(far, 100.0, 1e-5);
+}
+
+TEST(Matrix4, GLMImplicitMat4) {
+  using namespace ams;
+  ams::Matrix4 m(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+  glm::mat4 m2 = m;
+  // note: transposed to column major
+  EXPECT_EQ(m2[0][0], 1);
+  EXPECT_EQ(m2[0][1], 5);
+  EXPECT_EQ(m2[0][2], 9);
+  EXPECT_EQ(m2[0][3], 13);
+  EXPECT_EQ(m2[1][0], 2);
+  EXPECT_EQ(m2[1][1], 6);
+  EXPECT_EQ(m2[1][2], 10);
+  EXPECT_EQ(m2[1][3], 14);
+  EXPECT_EQ(m2[2][0], 3);
+  EXPECT_EQ(m2[2][1], 7);
+  EXPECT_EQ(m2[2][2], 11);
+  EXPECT_EQ(m2[2][3], 15);
+  EXPECT_EQ(m2[3][0], 4);
+  EXPECT_EQ(m2[3][1], 8);
+  EXPECT_EQ(m2[3][2], 12);
+  EXPECT_EQ(m2[3][3], 16);
 }
 
 }

@@ -22,6 +22,13 @@
 /*[ignore begin]*/
 #include "ams_game_export.hpp"
 /*[ignore end]*/
+#include <atomic>
+#include <vector>
+#include <chrono>
+#include <filesystem>
+
+/*[export module ams.game.Application]*/
+
 /*[exclude begin]*/
 #include "config.hpp"
 #include "Object.hpp"
@@ -29,12 +36,6 @@
 #include "Display.hpp"
 #include "Window.hpp"
 /*[exclude end]*/
-
-/*[export module ams.game.Application]*/
-
-#include <atomic>
-#include <vector>
-#include <chrono>
 /*[import ams.game.config]*/
 /*[import ams.game.Object]*/
 /*[import ams.game.ApplicationInfo]*/
@@ -85,7 +86,11 @@ protected:
   /** Frame synchronization time. When this value is 0us (the default value), the game will run as fast as possible. */
   time_unit vsyncTime = time_unit_1s * 0;
   
-  ApplicationInfo info;
+  /** Basic info about the application. */
+  const ApplicationInfo info;
+  
+  /** The local data directory for the application. */
+  const std::filesystem::path appDataDir;
   
   /** Currently loaded scenes. */
   std::vector<std::unique_ptr<Scene>> scenes;
@@ -93,7 +98,9 @@ protected:
   std::unique_ptr<Renderer> renderer;
   
 public:
-  Application(const std::string& name="Application", const WindowConfig& cfg=kDefaultWindowConfig);
+  Application(const ApplicationInfo& info, const WindowConfig& cfg=kDefaultWindowConfig);
+  
+  explicit Application(const std::string& name="Application", const WindowConfig& cfg=kDefaultWindowConfig);
   
   virtual ~Application();
   
@@ -207,6 +214,8 @@ public:
    * @return Window* if the window is associated with the application, nullptr otherwise.
    */
   static Window* getWindow(GLFWwindow* window);
+
+  std::filesystem::path getAppDataDir() const;
   
   /**
    * @brief Registers a listener to be called when the scene changes.

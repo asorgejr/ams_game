@@ -19,13 +19,13 @@
 #include <ams/spatial/Vec.hpp>
 #include "ams/game/Window.hpp"
 #include "ams/game/Application.hpp"
-#include "ams/game/Platform.hpp"
+#include "ams/game/SystemInfo.hpp"
 #include <regex>
 #else
 import ams.spatial.Vec;
 import ams.game.Window;
 import ams.game.Application;
-import ams.game.Platform;
+import ams.game.SystemInfo;
 import <regex>;
 #endif
 
@@ -202,7 +202,7 @@ bool Window::getIsMinimized() {
 
 void Window::setIsFocused(bool isFocused) {
   if (isFocused) {
-    if (System.os != Platform::Linux)
+    if (SystemInfo::os != Platform::Linux) // Wayland cannot capture window focus
       glfwFocusWindow(_window.get());
   }
   _isFocused = glfwGetWindowAttrib(_window.get(), GLFW_FOCUSED) == GLFW_TRUE;

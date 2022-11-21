@@ -18,9 +18,7 @@
 #include <gtest/gtest.h>
 
 #ifndef AMS_MODULES
-
 #include <ams/Uuid.hpp>
-
 #else
 import ams.Uuid;
 #endif
@@ -32,46 +30,44 @@ TEST(uuid, uuid) {
 
 TEST(uuid, uuid_string) {
   ams::Uuid uuid(0, 0);
-  EXPECT_EQ(uuid.to_string(), "00000000000000000000000000000000");
+  EXPECT_EQ(uuid.toString(), "00000000000000000000000000000000");
 }
 
 TEST(uuid, uuid_formatted_string) {
   ams::Uuid uuid = ams::Uuid(0, 0);
-  EXPECT_EQ(uuid.to_formatted_string(), "00000000-0000-0000-0000-000000000000");
+  EXPECT_EQ(uuid.toFormattedString(), "00000000-0000-0000-0000-000000000000");
 }
 
 TEST(uuid, uuid_from_string) {
-  ams::Uuid uuid = ams::Uuid::from_str("aabbccddeeff00112233445566778899");
-  EXPECT_EQ(uuid.to_string(), "aabbccddeeff00112233445566778899");
+  ams::Uuid uuid = ams::Uuid::fromStr("aabbccddeeff00112233445566778899");
+  EXPECT_EQ(uuid.toString(), "aabbccddeeff00112233445566778899");
 }
 
 TEST(uuid, uuid_from_formatted_string) {
-  ams::Uuid uuid = ams::Uuid::from_strfmt("00000000-0000-0000-0000-000000000000");
+  ams::Uuid uuid = ams::Uuid::fromStrfmt("00000000-0000-0000-0000-000000000000");
   EXPECT_EQ(uuid, ams::Uuid(0, 0));
 }
 
 TEST(uuid, uuid_from_two_values) {
-  uint64_t val1 = 0xAFAFAFAFAFAFAFAF;
-  uint64_t val2 = 0xBFBFBFBFBFBFBFBF;
-  ams::Uuid uuid = ams::Uuid(val1, val2);
-  EXPECT_EQ(uuid.to_string(), "afafafafafafafafbfbfbfbfbfbfbfbf");
+  uint64_t low = 0xAFAFAFAFAFAFAFAF;
+  uint64_t high = 0xBFBFBFBFBFBFBFBF;
+  ams::Uuid uuid = ams::Uuid(low, high);
+  EXPECT_EQ(uuid.toString(), "afafafafafafafafbfbfbfbfbfbfbfbf");
 }
 
 TEST(uuid, uuid_throw_for_invalid_string) {
-  EXPECT_THROW(ams::Uuid::from_str("aabbccddeeff0011223344556677889"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_str("aabbccddeeff00112233445566778899a"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_str("abcdefghijklmnopqrstuvwxyz/*-+++"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_str("ffffffff-ffff-ffff-ffff-ffffffffffff"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStr("aabbccddeeff0011223344556677889"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStr("aabbccddeeff00112233445566778899a"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStr("abcdefghijklmnopqrstuvwxyz/*-+++"), std::invalid_argument);
 }
 
 TEST(uuid, uuid_throw_for_invalid_formatted_string) {
-  EXPECT_THROW(ams::Uuid::from_str("aabbccddeeff0011223344556677889"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_str("aabbccddeeff00112233445566778899a"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_str("abcdefghijklmnopqrstuvwxyz/*-+++"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_str("ffffffff-ffff-ffff-ffff-ffffffffffff"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_strfmt("00000000-0000-0000-0000-00000000000"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_strfmt("00000000-0000-0000-0000-0000000000000"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_strfmt("00000000-0000-0000-0000-000000000000-"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_strfmt("0000000-0000-0000-0000-0000000000000"), std::invalid_argument);
-  EXPECT_THROW(ams::Uuid::from_strfmt("000000000-0000-0000-0000-00000000000"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStr("aabbccddeeff0011223344556677889"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStr("aabbccddeeff00112233445566778899a"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStr("abcdefghijklmnopqrstuvwxyz/*-+++"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStrfmt("00000000-0000-0000-0000-00000000000"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStrfmt("00000000-0000-0000-0000-0000000000000"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStrfmt("00000000-0000-0000-0000-000000000000-"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStrfmt("0000000-0000-0000-0000-0000000000000"), std::invalid_argument);
+  EXPECT_THROW(ams::Uuid::fromStrfmt("000000000-0000-0000-0000-00000000000"), std::invalid_argument);
 }

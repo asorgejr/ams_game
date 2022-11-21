@@ -85,6 +85,10 @@ public:
    */
   template<TComponent TComp>
   TComp* addComponent() {
+    // only 1 transform per entity
+    if constexpr (std::is_same_v<TComp, Transform>)
+      if (_transform != nullptr)
+        return throwOrDefault<std::invalid_argument, TComp*>("Entity already has a Transform", nullptr);
     auto comp = std::make_unique<TComp>(this);
     auto ptr = comp.get();
     _components.emplace_back(std::move(comp));
@@ -102,12 +106,14 @@ public:
    */
   template<TComponent... TComps>
   [[maybe_unused]] std::tuple<TComps*...> addComponents() {
-    (_components.emplace_back(std::make_unique<TComps>(this)), ...);
-    for (auto& comp : _components) {
-      if (auto* behavior = dynamic_cast<Behavior*>(comp.get()); behavior != nullptr)
-        _behaviors.add(behavior);
-    }
-    return std::make_tuple(static_cast<TComps*>(_components.back().get())...);
+    // reuse addComponent() to add each component
+    return std::make_tuple(addComponent<TComps>()...);
+//    (_components.emplace_back(std::make_unique<TComps>(this)), ...);
+//    for (auto& comp : _components) {
+//      if (auto* behavior = dynamic_cast<Behavior*>(comp.get()); behavior != nullptr)
+//        _behaviors.add(behavior);
+//    }
+//    return std::make_tuple(static_cast<TComps*>(_components.back().get())...);
   }
   
   /**

@@ -18,7 +18,7 @@ for header in $core_headers; do
   module_dir="$(echo $header_dir | sed 's/include/include\/modules/')"
   echo "Processing '$header'"
   # invoke python script to convert to modules
- python3 "$script_dir/CopyModules.py" --input "$header" --dest "$module_dir"
+ python3 "$script_dir/header2module.py" --input "$header" --dest "$module_dir"
 done
 
 spatial_headers=(${(f)"$(find "$spatial_dir"/include/ams -name '*.hpp')"})
@@ -28,7 +28,7 @@ for header in $spatial_headers; do
   module_dir="$(echo $header_dir | sed 's/include/include\/modules/')"
   echo "Processing '$header'"
   # invoke python script to convert to modules
- python3 "$script_dir/CopyModules.py" --input "$header" --dest "$module_dir"
+ python3 "$script_dir/header2module.py" --input "$header" --dest "$module_dir"
 done
 
 game_headers=(${(f)"$(find "$game_dir"/include/ams -name '*.hpp')"})
@@ -38,7 +38,7 @@ for header in $game_headers; do
   module_dir="$(echo $header_dir | sed 's/include/include\/modules/')"
   echo "Processing '$header'"
   # invoke python script to convert to modules
- python3 "$script_dir/CopyModules.py" --input "$header" --dest "$module_dir"
+ python3 "$script_dir/header2module.py" --input "$header" --dest "$module_dir"
 done
 
 echo "Finished"

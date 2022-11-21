@@ -1,9 +1,19 @@
-//
-// Created by asorgejr on 10/6/2022.
-//
-
-#include <gtest/gtest.h>
-#include <chrono>
+/*
+ * Copyright 2022 - Anthony Sorge
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+ * and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+ * of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. 
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+ * OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef AMS_MODULES
 #include <ams/game.hpp>
@@ -13,10 +23,16 @@ import ams.game;
 import ams.game.Util;
 #endif
 
+#include <gtest/gtest.h>
+#include <filesystem>
+#include <chrono>
+
 using std::to_string;
 using namespace std::chrono;
 using namespace std::chrono_literals;
+namespace fs = std::filesystem;
 using namespace ams;
+
 
 class TestApplication : public Application {
 private:
@@ -27,12 +43,12 @@ public:
   TestApplication(const std::string& name, const milliseconds& duration) : Application(name) {
     this->duration = duration;
   }
-    
+
 protected:
   void onRunStart() override {
     start = clk_t::now();
   }
-  
+
   void onFrameEnd() override {
     auto elapsed = clk_t::now() - start;
     if (elapsed > duration) {
@@ -42,7 +58,7 @@ protected:
 };
 
 class TestBehaviorVirtMethods : public Behavior {
-AMSBehavior(TestBehaviorVirtMethods)
+  AMSBehavior(TestBehaviorVirtMethods)
 private:
   time_point<clk_t> _start = clk_t::now();
   Application* _app = nullptr;
@@ -66,70 +82,8 @@ public:
   }
 };
 
-TEST(Game, Application) {
-  Application app;
-  EXPECT_EQ(app.getName(), "Application");
-  EXPECT_NE(app.getCurrentScene(), nullptr);
-  EXPECT_EQ(app.getCurrentScene()->getName(), "Application_default_" + to_string(app.getId()));
-}
 
-TEST(Game, ApplicationStaticInstnaceDestroyed) {
-  if (AMSExceptions) {
-    EXPECT_THROW(Application::getInstance(), NullPointerException);
-  } else {
-    EXPECT_EQ(Application::getInstance(), nullptr);
-  }
-}
-
-TEST(Game, AppInitScene) {
-  Application app;
-  auto* pScene = app.createScene("TestScene");
-  EXPECT_NE(pScene, nullptr);
-}
-
-TEST(Game, AppSetCurrentScene) {
-  Application app;
-  auto* pScene = app.createScene("TestScene");
-  app.setCurrentScene(pScene->getName());
-  EXPECT_EQ(app.getCurrentScene(), pScene);
-}
-
-TEST(Game, AppGetCurrentScene) {
-  Application app;
-  auto* pScene = app.createScene("TestScene");
-  app.setCurrentScene(pScene->getName());
-  EXPECT_EQ(app.getCurrentScene(), pScene);
-}
-
-TEST(Game, AppSceneTryGet) {
-  Application app;
-  auto* pScene = app.createScene("TestScene");
-  Scene* pScene1 = nullptr;
-  EXPECT_TRUE(app.tryGetScene("TestScene", pScene1));
-  EXPECT_EQ(pScene1, pScene);
-  Scene* pScene2 = nullptr;
-  EXPECT_FALSE(app.tryGetScene("TestScene2", pScene2));
-  EXPECT_EQ(pScene2, nullptr);
-}
-
-TEST(Game, AppGetScene) {
-  Application app;
-  auto* pScene = app.createScene("TestScene");
-  EXPECT_EQ(app.getScene("TestScene"), pScene);
-#ifdef AMS_EXCEPTIONS
-  EXPECT_ANY_THROW(app.getScene("TestScene2"));
-#else
-  EXPECT_EQ(app.getScene("TestScene2"), nullptr);
-#endif
-}
-
-TEST(Game, AppWindow) {
-  Application app;
-  EXPECT_NE(app.getWindow(), nullptr);
-  app.exit();
-}
-
-TEST(Game, SceneCreateEntity) {
+TEST(Entity, SceneCreateEntity) {
   Application app;
   auto* pScene = app.createScene("TestScene");
   auto* pEntity = pScene->createEntity();
@@ -137,7 +91,7 @@ TEST(Game, SceneCreateEntity) {
   EXPECT_EQ(pEntity->getName(), "Object_" + to_string(pEntity->getId()));
 }
 
-TEST(Game, SceneCreateCamera) {
+TEST(Entity, SceneCreateCamera) {
   Application app;
   auto* pScene = app.createScene("TestScene");
   auto* pEntity = pScene->createEntity();
@@ -145,7 +99,7 @@ TEST(Game, SceneCreateCamera) {
   EXPECT_NE(pCamera, nullptr);
 }
 
-TEST(Game, EntityAddComponent) {
+TEST(Entity, AddComponent) {
   TestApplication app("TestApp", 1000ms);
   auto* pScene = app.createScene("TestScene");
   auto* pEntity = pScene->createEntity();
@@ -153,7 +107,7 @@ TEST(Game, EntityAddComponent) {
   app.setCurrentScene(pScene->getName());
   app.setVsyncTime(65);
   app.run();
-  
+
   EXPECT_NE(pComp, nullptr);
   EXPECT_EQ(pComp->getName(), "Object_" + to_string(pComp->getId()));
   EXPECT_EQ(pComp->testWasEnabled, true);
@@ -162,7 +116,33 @@ TEST(Game, EntityAddComponent) {
   app.exit();
 }
 
-TEST(Game, 100EntitiesAddComponentPerfTest) {
+TEST(Entity, AddComponents) {
+  TestApplication app("TestApp", 1000ms);
+  auto* pScene = app.createScene("TestScene");
+  auto* pEntity = pScene->createEntity();
+  auto[comp1, comp2] = pEntity->addComponents<TestBehaviorVirtMethods, TestBehaviorVirtMethods>();
+  app.setCurrentScene(pScene->getName());
+  app.run();
+
+  EXPECT_NE(comp1, nullptr);
+  EXPECT_NE(comp2, nullptr);
+  app.exit();
+}
+
+TEST(Entity, AddExtraTransformFails) {
+  TestApplication app("TestApp", 1000ms);
+  auto* pScene = app.createScene("TestScene");
+  auto* pEntity = pScene->createEntity();
+  EXPECT_NE(pEntity->getTransform(), nullptr); // default transform is always added
+  if (AMSExceptions) {
+    EXPECT_ANY_THROW(pEntity->addComponent<Transform>());
+  } else {
+    EXPECT_EQ(pEntity->addComponent<Transform>(), nullptr);
+  }
+  app.exit();
+}
+
+TEST(Entities, 100AddComponentPerfTest) {
   TestApplication app("TestApp", 1000ms);
   auto* pScene = app.createScene("TestScene");
   std::vector<ams::Entity*> entities;
@@ -174,7 +154,7 @@ TEST(Game, 100EntitiesAddComponentPerfTest) {
   app.setCurrentScene(pScene->getName());
   app.setVsyncTime(65);
   app.run();
-  
+
   for (auto& pEntity : entities) {
     auto* pComp = pEntity->getComponent<TestBehaviorVirtMethods>();
     EXPECT_NE(pComp, nullptr);

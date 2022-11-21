@@ -14,6 +14,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+// This file uses metatags to convert headers to module-interfaces using header2module.py.
+// Any block comment formatted as: /*[   ]*/ is a metatag and other code may depend on it.
+// Proceed with caution when modifying such comments.
 
 /*[export module ams.game.NullPointerException]*/
 /*[exclude begin]*/
@@ -26,11 +29,6 @@
 /*[export]*/ namespace ams {
 class NullPointerException : public Exception {
 public:
-  using Exception::Exception;
-  NullPointerException() : Exception() {}
-protected:
-  const char* defaultMessage() const noexcept override {
-    return "NullPointerException";
-  }
+using Exception::Exception;
 };
 } // ams

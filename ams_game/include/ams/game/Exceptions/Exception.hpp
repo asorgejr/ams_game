@@ -14,27 +14,50 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+// This file uses metatags to convert headers to module-interfaces using header2module.py.
+// Any block comment formatted as: /*[   ]*/ is a metatag and other code may depend on it.
+// Proceed with caution when modifying such comments.
 
-/*[export module ams.Exception]*/
+/*[module]*/
 /*[exclude begin]*/
 #pragma once
+#include "ams_game_sysinfo.hpp"
+#if defined(AMS_OS_WINDOWS)
+  #ifndef __cpp_consteval
+    #define __cpp_consteval // TODO: This is a hack to suppress a warning in the Windows SDK.
+  #endif
+#endif
 /*[exclude end]*/
+
+/*[export module ams.game.Exception]*/
 #include <exception>
+#include <string>
+#include <format>
+#include <source_location>
+/*[exclude begin]*/
+/*[exclude end]*/
+
 
 /*[export]*/ namespace ams {
 
 class Exception : public std::exception {
 protected:
-  const char* message;
-  [[nodiscard]] virtual const char* defaultMessage() const noexcept {
-    return "Exception";
-  }
+  const std::source_location trace;
+  const std::string message;
+
 public:
-  Exception() : message(defaultMessage()) {}
-  explicit Exception(const char* message) : message(message) {};
+  explicit Exception(const std::string& message = "An exception has occurred",
+                     const std::source_location& trace = std::source_location::current())
+  : std::exception(message.c_str()), trace(trace), message(message) {}
+
   ~Exception() override = default;
-  [[nodiscard]] const char* what() const noexcept override {
-    return message;
+
+  [[nodiscard]] virtual const std::source_location& getTrace() const noexcept {
+    return trace;
+  }
+
+  [[nodiscard]] virtual std::string toString() const {
+    return std::format("{}: {}:{}:{}", what(), trace.file_name(), trace.line(), trace.column());
   }
 };
 

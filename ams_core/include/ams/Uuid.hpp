@@ -18,14 +18,17 @@
 /*[module]*/
 /*[exclude begin]*/
 #pragma once
-#include "config.hpp"
 /*[exclude end]*/
 /*[ignore begin]*/
-#include <boost/multiprecision/cpp_int.hpp>
 #include "ams_core_export.hpp"
 /*[ignore end]*/
+/*[exclude begin]*/
+#include "ams/config.hpp"
+/*[exclude end]*/
 
 /*[export module ams.Uuid]*/
+#include <cstdint>
+#include <cstddef>
 #include <array>
 #include <random>
 #include <sstream>
@@ -34,46 +37,50 @@
 /*[import ams.config]*/
 
 
-namespace ams {
-
-using uint128_t = boost::multiprecision::uint128_t;
+/*[export]*/ namespace ams {
 
 /**
- * @brief A class that generates a UUID.
- * @details This class generates a UUID based on the RFC 4122 standard.
+ * @brief This class is a 128-bit UUID based on the RFC 4122 standard.
  * @see https://tools.ietf.org/html/rfc4122
  */
-/*[export]*/ struct AMS_CORE_EXPORT Uuid final {
-private:
-  /**
-   * The underlying data of the UUID. A series of 8 64-bit integers.
-   */
-  uint128_t data;
-
+struct AMS_CORE_EXPORT Uuid final {
 public:
+  uint64_t low = dis(gen);
+  uint64_t high = dis(gen);
   /**
    * @brief Construct a new uuid object
    */
-  Uuid() : data(dis(gen)) {}
+  Uuid() = default;
   
-  constexpr Uuid(uint64_t val1, uint64_t val2)
-    : data((uint128_t(val1) << 64) | uint128_t(val2)) {}
+/**
+   * @brief Construct a new uuid object
+   * @param low The low 64 bits of the UUID
+   * @param high The high 64 bits of the UUID
+   */
+  Uuid(uint64_t low, uint64_t high) : low(low), high(high) {}
+  
+  /**
+   * @brief Construct a new uuid object
+   * @param uuid The UUID to copy
+   */
+  explicit Uuid(const std::string& uuid) {
+    *this = Uuid::fromStr(uuid);
+  }
 
   /**
    * @brief Construct a new uuid object
    * @param other - The uuid to copy
    */
-  constexpr Uuid(const Uuid& other) {
-    data = other.data;
-  }
+  Uuid(const Uuid& other) = default;
   
-  constexpr Uuid& operator=(const Uuid& other) = default;
+  Uuid& operator=(const Uuid& other) = default;
 
-  constexpr bool operator==(const Uuid& other) const {
-    return data == other.data;
+  bool operator==(const Uuid& other) const {
+    // compare data elements
+    return low == other.low && high == other.high;
   }
 
-  constexpr bool operator!=(const Uuid& other) const {
+  bool operator!=(const Uuid& other) const {
     return !(*this == other);
   }
 
@@ -81,16 +88,16 @@ public:
    * @brief Get the string representation of the uuid
    * @return std::string - The string representation of the uuid
    */
-  [[nodiscard]] std::string to_string() const {
+  [[nodiscard]] std::string toString() const {
     std::stringstream ss{};
-    ss << std::hex << data;
+    ss << std::hex << low << high;
     // ensure that the string is 32 characters long
     std::string str = ss.str();
     str.insert(0, 32 - str.length(), '0');
     return str;
   }
 
-  static constexpr bool is_valid_str(const std::string& str) {
+  static bool isValidStr(const std::string& str) {
     if (str.length() != 32)
       return false;
     // return std::ranges::all_of(str, [](char c) {
@@ -99,7 +106,7 @@ public:
     });
   }
   
-  static constexpr bool is_valid_strfmt(const std::string& str) {
+  static bool isValidStrfmt(const std::string& str) {
     if (str.length() != 36)
       return false;
     if (str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-')
@@ -110,9 +117,9 @@ public:
     });
   }
 
-  [[nodiscard]] std::string to_formatted_string() const {
+  [[nodiscard]] std::string toFormattedString() const {
     // format string as 8-4-4-4-12
-    std::string str = to_string();
+    std::string str = toString();
     std::string formatted = str.substr(0, 8);
     formatted += "-";
     formatted += str.substr(8, 4);
@@ -126,17 +133,21 @@ public:
   }
   
   /**
-   * @brief creates a uuid from a hex string
-   * @param str - The 32 char hex string to create the uuid from
+   * @brief Creates a uuid from a hex string.
+   * @param str - The 32 or 36 char hex string to create the uuid from
    * @return uuid - The uuid created from the hex string
    */
-  static Uuid from_str(const std::string& str) {
-    if (!is_valid_str(str))
-      throw std::invalid_argument("Invalid string");
-    Uuid u;
-    std::stringstream ss;
-    ss << std::hex << str;
-    ss >> u.data;
+  static Uuid fromStr(const std::string& str) {
+    if (str.length() != 32) {
+      if (str.length() != 36)
+        throw std::invalid_argument("Invalid UUID string length");
+      return fromStrfmt(str);
+    }
+    Uuid u(0,0);
+    auto low = str.substr(0, 16);
+    auto high = str.substr(16, 16);
+    u.low = std::stoull(low, nullptr, 16);
+    u.high = std::stoull(high, nullptr, 16);
     return u;
   }
   
@@ -145,12 +156,12 @@ public:
    * @param str - The 8-4-4-4-12 formatted hex string to create the uuid from
    * @return uuid - The uuid created from the hex string
    */
-  static Uuid from_strfmt(const std::string& str) {
-    if (!is_valid_strfmt(str))
+  static Uuid fromStrfmt(const std::string& str) {
+    if (!isValidStrfmt(str))
       throw std::invalid_argument("Invalid string");
     std::string unformatted = str;
     unformatted.erase(std::remove(unformatted.begin(), unformatted.end(), '-'), unformatted.end());
-    return from_str(unformatted);
+    return fromStr(unformatted);
   }
   
 private:

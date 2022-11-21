@@ -15,7 +15,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #ifndef AMS_MODULES
-#include "../../include/ams/game/Platform.hpp"
+#include "../../include/ams/game/SystemInfo.hpp"
 #else
-import ams.game.Platform;
+import ams.game.SystemInfo;
 #endif

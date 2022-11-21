@@ -54,6 +54,10 @@ bool hasUSDLoader = Mesh::registerMeshLoader<USDMeshLoader>();
 void saveToHPP(const Mesh& mesh, const fs::path& path);
 
 int main(int argc, char** argv) {
+  #ifdef AMS_UTIL_DEBUG
+  std::cout << "Debug Mode, press any key to continue..." << std::endl;
+  std::cin.get();
+  #endif
   argparse::ArgumentParser program("convmesh");
   program.add_argument("input")
     .help("Input file path");
@@ -88,25 +92,25 @@ int main(int argc, char** argv) {
   }
   // check if input file is supported by extension
   // get extension without dot
-  auto ext = fs::path(input).extension().string().substr(1);
+  auto ext = input.extension().string().substr(1);
   auto supported = Mesh::getSupportedFileTypes();
   if (std::find(supported.begin(), supported.end(), ext) == supported.end()) {
     std::cout << "Input file type is not supported" << std::endl;
     exit(0);
   }
+  
+  if (name.empty()) {
+    name = input.stem().string();
+  }
+
+  auto outfile = fs::path(output.string() + "/" + name + ".ams");
   // make sure we are not overwriting the input file
-  auto outputpath = fs::path(output) / fs::path(input).filename();
-  if (fs::path(input).string() == outputpath.string()) {
+  if (fs::absolute(input) == fs::absolute(outfile)) {
     std::cout << "Output file cannot be the Input file" << std::endl;
     exit(0);
   }
   
-  if (name.empty()) {
-    name = fs::path(input).stem().string();
-  }
-  
   auto mesh = Mesh::fromFile(input);
-  auto outfile = fs::path(output.string() + "/" + name + ".ams");
   Mesh::saveToFile(mesh, outfile, binary);
   return 0;
 }

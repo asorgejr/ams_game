@@ -29,8 +29,56 @@ namespace ams {
 
 using namespace ams::internal;
 
-Camera::Camera(ams::Entity* entity) : ActiveComponent(entity) {
+Camera::Camera(ams::Entity* entity)
+: ActiveComponent(entity)
+{
   entity->getScene()->registerCamera(this);
+}
+
+void Camera::setProjectionMatrix(const Matrix4& matrix) {
+  projectionMatrix = matrix;
+  // extract fov, aspect ratio, near and far planes
+  Matrix4::extractPerspective(projectionMatrix, fov, aspectRatio, nearPlane, farPlane);
+}
+
+const Matrix4& Camera::getProjectionMatrix() const {
+  return projectionMatrix;
+}
+
+void Camera::setFOV(decimal_t f) {
+  this->fov = f;
+  projectionMatrix.setPerspective(fov, aspectRatio, nearPlane, farPlane);
+}
+
+decimal_t Camera::getFOV() const {
+  return fov;
+}
+
+void Camera::setAspectRatio(decimal_t ar) {
+  this->aspectRatio = ar;
+  projectionMatrix.setPerspective(fov, aspectRatio, nearPlane, farPlane);
+}
+
+decimal_t Camera::getAspectRatio() const {
+  return 0;
+}
+
+void Camera::setNearPlane(decimal_t np) {
+  this->nearPlane = np;
+  projectionMatrix.setPerspective(fov, aspectRatio, nearPlane, farPlane);
+}
+
+decimal_t Camera::getNearPlane() const {
+  return nearPlane;
+}
+
+void Camera::setFarPlane(decimal_t fp) {
+  this->farPlane = fp;
+  projectionMatrix.setPerspective(fov, aspectRatio, nearPlane, farPlane);
+}
+
+decimal_t Camera::getFarPlane() const {
+  return farPlane;
 }
 
 // TODO: Add a way to unregister the camera from the scene

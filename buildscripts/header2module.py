@@ -32,12 +32,13 @@
 # The comment tags are:
 # /*[module]*/ -- global module fragment
 # /*[export]*/ -- exports a code block to the module
-# /*[export <module name>]*/ -- exports a global module fragment
-# /*[import <module name>]*/ -- imports a module
+# /*[export ...]*/ -- exports a global module fragment named "..."
+# /*[import ...]*/ -- imports a module named "..."
+# /*[import <...>]*/ -- imports a legacy header named "..."
 # /*[exclude begin]*/ -- everything in an exclude block is removed
 # /*[exclude end]*/ -- everything in an exclude block is removed
-# /*[ignore begin]*/ -- everything in an ignore block is ignored
-# /*[ignore end]*/ -- everything in an ignore block is ignored
+# /*[ignore begin]*/ -- everything in an ignore block is left as-is
+# /*[ignore end]*/ -- everything in an ignore block is left as-is
 
 import os
 import re
@@ -197,7 +198,7 @@ def get_tag_block(contents: ModifiedText, start: int):
     return ret.text()[tb:te]
 
 
-def find_ignore_blocks(contents: ModifiedText) -> (ModifiedText, List[Tuple[int, int]]):
+def find_ignore_blocks(contents: ModifiedText) -> Tuple[ModifiedText, List[Tuple[int, int]]]:
     ret = contents
     ignore_blocks = []
     result = ret.text()
@@ -331,8 +332,8 @@ def replace_import_module_tag(contents: ModifiedText) -> ModifiedText:
 mod_incl_file_expr = r'[a-zA-Z_][a-zA-Z0-9_/]*[a-zA-Z0-9_](\.[a-zA-Z]{1,4})?'
 include_header_expr = r'#include *(<{0}>)'.format(mod_incl_file_expr)
 include_header_rgx = re.compile(include_header_expr, re.MULTILINE)
-def replace_include_lib(contents: ModifiedText) -> ModifiedText:
-    # replace #include <module> with import <module>;
+def replace_include_header(contents: ModifiedText) -> ModifiedText:
+    # replace #include <...> with import <...>;
     # return modified text object
     ret = contents
     result = ret.text()
@@ -360,21 +361,21 @@ def replace_include_lib(contents: ModifiedText) -> ModifiedText:
     ret.set(result)
     return ret
 
-# def replace_std_include(contents: str, ignore_blocks: List[Tuple[int, int]] = None) -> (str, int):
-#     # replace #include <module> with import <module>; if module is a standard module
-#     # return modified contents and the change in character count
-#     count = len(contents)
-#     match = include_header_rgx.search(contents)
-#     while match is not None:
-#         if in_ignore_block(match.start(), ignore_blocks):
-#             match = include_header_rgx.search(contents, match.end())
-#             continue
-#         contents = contents[:match.start()] + 'import {0}{1}{2};'.format(match.group(1)[0],
-#                                                                          match.group(1)[1:-1],
-#                                                                          match.group(1)[-1]) \
-#                    + contents[match.end():]
-#         match = include_header_rgx.search(contents, match.end())
-#     return contents, len(contents) - count
+
+metatag_prompt = \
+    r"\s*\/\/\s*This file uses metatags to convert headers to module-interfaces using header2module\.py\.\s*\n" \
+    r"\s*\/\/\s*Any block comment formatted as\: \/\*\[\s*\]\*\/ is a metatag and other code may depend on it\.\s*\n" \
+    r"\s*\/\/\s*Proceed with caution when modifying such comments\.\s*"
+def rem_metatag_prompt(contents: ModifiedText) -> ModifiedText:
+    # remove metatag prompt from the top of the file
+    # return modified text object
+    ret = contents
+    result = ret.text()
+    match = re.search(metatag_prompt, result)
+    if match is not None:
+        result = result[:match.start()] + '\n' + result[match.end():]
+        ret.set(result)
+    return ret
 
 
 def modify_file(filename, no_implicit=False) -> str:
@@ -386,7 +387,7 @@ def modify_file(filename, no_implicit=False) -> str:
         text = f.read()
     contents = ModifiedText(text)
     # contents, ignore_blocks = find_ignore_blocks(contents)
-    # remove all strip blocks
+    # remove all exclude blocks
     contents = exclude_block(contents)
     # find a module tag if it exists
     contents = replace_module_tag(contents)
@@ -400,7 +401,8 @@ def modify_file(filename, no_implicit=False) -> str:
     contents = replace_import_module_tag(contents)
     # replace std includes with import statements
     if not no_implicit:
-        contents = replace_include_lib(contents)
+        contents = replace_include_header(contents)
+    contents = rem_metatag_prompt(contents)
     return contents.text()
 
 

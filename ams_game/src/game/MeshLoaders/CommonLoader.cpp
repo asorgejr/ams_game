@@ -50,12 +50,42 @@ Mesh CommonLoader::load(const std::filesystem::path& path) const {
   Mesh::faces_t faces;          // aka vector<vector<uint32_t>>
   Mesh::submeshes_t submeshes;  // aka vector<vector<uint32_t>>
 
+  
   for (uint32_t i = 0; i < scene->mNumMeshes; i++) {
     aiMesh* mesh = scene->mMeshes[i];
+    // start with required data
+    if (!mesh->HasPositions())
+      throw std::runtime_error("Mesh has no vertices");
+    if (!mesh->HasFaces())
+      throw std::runtime_error("Mesh has no faces");
     // get vertices
     for (uint32_t j = 0; j < mesh->mNumVertices; j++) {
       vertices.push_back(mesh->mVertices[j]);
-      normals.push_back(mesh->mNormals[j]);
+    }
+    // faces
+    auto submeshElem = std::vector<uint32_t>();
+    for (uint32_t k = 0; k < mesh->mNumFaces; k++) {
+      aiFace face = mesh->mFaces[k];
+      auto faceElem = std::vector<uint32_t>();
+      for (uint32_t l = 0; l < face.mNumIndices; l++) {
+        faceElem.push_back(face.mIndices[l]);
+      }
+      faces.push_back(faceElem);
+      submeshElem.push_back(faces.size() - 1);
+    }
+    submeshes.push_back(submeshElem);
+    
+    // normals (generate if not present)
+    if (mesh->HasNormals()) {
+      for (uint32_t j = 0; j < mesh->mNumVertices; j++) {
+        normals.push_back(mesh->mNormals[j]);
+      }
+    } else {
+      normals = Mesh::generateNormals(vertices, faces);
+    }
+    
+    // optional data
+    for (uint32_t j = 0; j < mesh->mNumVertices; j++) {
       if (mesh->mTangents) {
         tangents.push_back(mesh->mTangents[j]);
       }
@@ -76,20 +106,9 @@ Mesh CommonLoader::load(const std::filesystem::path& path) const {
         colors.push_back({color.r, color.g, color.b, color.a});
       }
     }
-
-    // faces
-    auto submeshElem = std::vector<uint32_t>();
-    for (uint32_t k = 0; k < mesh->mNumFaces; k++) {
-      aiFace face = mesh->mFaces[k];
-      auto faceElem = std::vector<uint32_t>();
-      for (uint32_t l = 0; l < face.mNumIndices; l++) {
-        faceElem.push_back(face.mIndices[l]);
-      }
-      faces.push_back(faceElem);
-      submeshElem.push_back(faces.size() - 1);
-    }
-    submeshes.push_back(submeshElem);
   }
+  
+
 
   return Mesh(vertices, normals, tangents,
               uv, uv2, uv3, uv4,

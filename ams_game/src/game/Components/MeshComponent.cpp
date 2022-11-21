@@ -14,39 +14,37 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/*[exclude begin]*/
-#pragma once
-/*[exclude end]*/
-/*[export module ams.config]*/
-/*[export]*/ #include <cstdint>
-/*[export]*/ #include <cstddef>
 
-/*[export]*/ namespace ams {
-
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
+#ifndef AMS_MODULES
+#include "ams/game/Components/MeshComponent.hpp"
+#include "ams/game/internal/Meshes.hpp"
 #else
-  false;
-#endif
-  
-constexpr bool AMSNegativeIndexing =
-#ifdef AMS_NEGATIVE_INDEXING
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMS128BitIntegers =
-#ifdef AMS_ENABLE_128BIT_INTEGERS
-  true;
-#else
-  false;
+import ams.game.Components.MeshComponent;
+import ams.game.internal.Meshes;
 #endif
 
+
+namespace ams {
+MeshComponent::MeshComponent(Entity* entity, Mesh* mesh)
+  : ActiveComponent(entity),
+    _sharedMesh(mesh)
+{
+  if (!_sharedMesh) {
+    _sharedMesh = &internal::Meshes::BoxMesh; // todo: shared mesh || instanced mesh
+  }
 }
+
+MeshComponent::~MeshComponent() {
+  if (_mesh)
+    delete _mesh;
+}
+
+const Mesh* MeshComponent::getMesh() const {
+  return _mesh ? _mesh : _sharedMesh;
+}
+
+void MeshComponent::setMesh(Mesh* mesh) {
+  _sharedMesh = mesh;
+}
+
+} // ams

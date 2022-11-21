@@ -15,10 +15,10 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*[export module ams.game.config]*/
 /*[exclude begin]*/
 #pragma once
 /*[exclude end]*/
+/*[export module ams.game.config]*/
 #include <chrono>
 
 using namespace std::chrono_literals;

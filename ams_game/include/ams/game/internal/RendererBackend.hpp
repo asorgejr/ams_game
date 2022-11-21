@@ -44,6 +44,32 @@ constexpr bool AMSGraphicsDebug =
 #else
   false;
 #endif
+  
+enum class GraphicsDebugSeverity {
+  None= 0x0,
+  Fatal = 0x1,
+  Error = 0x2,
+  Warning = 0x3,
+  Info = 0x4,
+  Debug = 0x5,
+  Verbose = 0x6,
+};
+
+constexpr GraphicsDebugSeverity AMSGraphicsDebugSeverity =
+#if AMS_GRAPHICS_DEBUG_SEVERITY == 1
+  GraphicsDebugSeverity::Error;
+#elif AMS_GRAPHICS_DEBUG_SEVERITY == 2
+  GraphicsDebugSeverity::Warning;
+#elif AMS_GRAPHICS_DEBUG_SEVERITY == 3
+  GraphicsDebugSeverity::Info;
+#elif AMS_GRAPHICS_DEBUG_SEVERITY == 4
+  GraphicsDebugSeverity::Debug;
+#elif AMS_GRAPHICS_DEBUG_SEVERITY == 5
+  GraphicsDebugSeverity::Verbose;
+#else
+  GraphicsDebugSeverity::Fatal;
+#endif
+  
 
 /*[export]*/ namespace ams::internal {
 

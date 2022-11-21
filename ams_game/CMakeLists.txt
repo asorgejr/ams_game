@@ -3,11 +3,23 @@ set(COMPONENT_NAME game)
 find_package(OpenGL REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(Vulkan 1.3)
+find_package(glm CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(nameof CONFIG REQUIRED)
 
 
 option(AMS_REQUIRE_OPENGL "Require OpenGL" OFF)
 option(AMS_REQUIRE_VULKAN "Require Vulkan" OFF)
 option(AMS_GRAPHICS_DEBUG "Enable graphics debug" OFF)
+set(AMS_GRAPHICS_DEBUG_SEVERITY 3 CACHE STRING
+"Graphics debug message severity level (0==Fatal, 1==Error, 2==Warning, 3==Info, 4==Debug, 5==Verbose).
+This option is only applicable when AMS_GRAPHICS_DEBUG == ON"
+)
+# convert AMS_GRAPHICS_DEBUG_SEVERITY to number
+string(REGEX REPLACE "[^0-9]" "" AMS_GRAPHICS_DEBUG_SEVERITY "${AMS_GRAPHICS_DEBUG_SEVERITY}")
+if (NOT AMS_GRAPHICS_DEBUG_SEVERITY)
+  set(AMS_GRAPHICS_DEBUG_SEVERITY 3)
+endif()
 
 if (NOT Vulkan_FOUND)
   if (AMS_REQUIRE_VULKAN)
@@ -20,7 +32,7 @@ else()
   find_path(VULKAN_HPP_INCLUDE_DIRS "vulkan/vulkan.hpp" REQUIRED)
 endif()
 
-if (ENABLE_MODULES)
+if (AMS_ENABLE_MODULES)
   file(GLOB_RECURSE ${COMPONENT_NAME}_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/ams/*.cppm
     )
@@ -74,15 +86,20 @@ if (NOT AMS_REQUIRE_OPENGL AND Vulkan_FOUND)
   )
 endif()
 target_compile_definitions(${COMPONENT_NAME} PUBLIC
-  "AMS_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
-  "AMS_OS_${AMS_OS}"
-  "AMS_OS_VERSION=\"${AMS_OS_VERSION}\""
-  "AMS_COMPILER_${AMS_COMPILER}"
-  "AMS_COMPILER_VERSION=\"${AMS_COMPILER_VERSION}\""
-  "AMS_ARCH_${AMS_ARCH}"
-  "AMS_LIBRARY_VERSION=${AMS_LIBRARY_VERSION}"
-  "GLFW_DLL"
+#  AMS_CXX_STANDARD=${CMAKE_CXX_STANDARD}
+#  AMS_OS_${AMS_OS}
+#  AMS_OS_VERSION=\"${AMS_OS_VERSION}\"
+#  AMS_COMPILER_${AMS_COMPILER}
+#  AMS_COMPILER_VERSION=\"${AMS_COMPILER_VERSION}\"
+#  AMS_ARCH_${AMS_ARCH}
+#  AMS_CPU_COUNT=${AMS_CPU_CORES}
+#  AMS_LIBRARY_VERSION=\"${AMS_LIBRARY_VERSION}\"
+  GLFW_DLL
 )
+
+# configure header so defines with integer values are not wrapped in quotes. 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ams_game_sysinfo.hpp.in
+               ${CMAKE_CURRENT_BINARY_DIR}/include/ams_game_sysinfo.hpp)
 
 add_subdirectory(third_party)
 
@@ -92,8 +109,11 @@ target_link_libraries(${COMPONENT_NAME}
     spatial
     OpenGL::GL
     glfw
+    glm::glm
   PRIVATE
     assimp::assimp
+    spdlog::spdlog
+    nameof::nameof
 )
 
 if (AMS_REQUIRE_OPENGL)
@@ -108,9 +128,13 @@ elseif (AMS_REQUIRE_VULKAN)
   )
 endif()
 if (AMS_GRAPHICS_DEBUG)
+  if (AMS_GRAPHICS_DEBUG_SEVERITY LESS 0 OR AMS_GRAPHICS_DEBUG_SEVERITY GREATER 5)
+    message(FATAL_ERROR "Invalid AMS_GRAPHICS_DEBUG_SEVERITY value")
+  endif()
   target_compile_definitions(${COMPONENT_NAME}
     PUBLIC
       AMS_GRAPHICS_DEBUG
+      AMS_GRAPHICS_DEBUG_SEVERITY=${AMS_GRAPHICS_DEBUG_SEVERITY}
 )
 endif()
 

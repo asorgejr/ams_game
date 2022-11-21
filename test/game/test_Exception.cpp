@@ -14,39 +14,48 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/*[exclude begin]*/
-#pragma once
-/*[exclude end]*/
-/*[export module ams.config]*/
-/*[export]*/ #include <cstdint>
-/*[export]*/ #include <cstddef>
 
-/*[export]*/ namespace ams {
+#ifndef AMS_MODULES
+#include "ams/game/Exceptions.hpp"
+#else
+import ams.game.Exceptions
+#endif
+#include <filesystem>
+#include <gtest/gtest.h>
 
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMSNegativeIndexing =
-#ifdef AMS_NEGATIVE_INDEXING
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMS128BitIntegers =
-#ifdef AMS_ENABLE_128BIT_INTEGERS
-  true;
-#else
-  false;
-#endif
+using std::string;
+namespace fs = std::filesystem;
 
+TEST(Exception, DefaultConstructor) {
+  ams::Exception e;
+  EXPECT_STREQ(e.what(), "An exception has occurred");
+}
+
+TEST(Exception, What) {
+  try {
+    throw ams::Exception("Test Exception");
+  } catch (ams::Exception& e) {
+    EXPECT_STREQ(e.what(), "Test Exception");
+  }
+}
+
+TEST(Exception, GetTrace) {
+  try {
+    throw ams::Exception("Test Exception");
+  } catch (ams::Exception& e) {
+    EXPECT_STREQ(fs::path(e.getTrace().file_name()).filename().string().c_str(), "test_Exception.cpp");
+  }
+}
+
+TEST(Exception, ToString) {
+  int line=0;
+  int col = 0;
+  try {
+    line = __LINE__ + 1;
+/*|||||||1|||||||||2|||||||||3|||||||||4|||||||||5|||||||||6|||||||||7|||||||||8|||||||*/
+    throw ams::Exception("Test Exception");
+  } catch (ams::Exception& e) {
+    string expected = string("Test Exception: ") + __FILE__ + ":" + std::to_string(line) + ":25";
+    EXPECT_STREQ(e.toString().c_str(), expected.c_str());
+  }
 }

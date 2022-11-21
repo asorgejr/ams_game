@@ -14,39 +14,30 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/*[exclude begin]*/
-#pragma once
-/*[exclude end]*/
-/*[export module ams.config]*/
-/*[export]*/ #include <cstdint>
-/*[export]*/ #include <cstddef>
 
-/*[export]*/ namespace ams {
+#ifndef AMS_MODULES
+#include "ams/game/SystemInfo.hpp"
+#else
+import ams.game.SystemInfo;
+#endif
 
-/**
- * @brief Compile-time constant. 
- * @details If true, methods can throw exceptions when an error occurs.
- * If false, methods will not throw exceptions, but will instead return a default value.
- */
-constexpr bool AMSExceptions =
-#ifdef AMS_EXCEPTIONS
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMSNegativeIndexing =
-#ifdef AMS_NEGATIVE_INDEXING
-  true;
-#else
-  false;
-#endif
-  
-constexpr bool AMS128BitIntegers =
-#ifdef AMS_ENABLE_128BIT_INTEGERS
-  true;
-#else
-  false;
-#endif
+namespace fs = std::filesystem;
+
+namespace ams {
+
+
+const fs::path SystemInfo::localDataDirectory =
+  os == Platform::Windows
+  ? fs::path(std::getenv("APPDATA"))
+  : os == Platform::MacOS
+    ? fs::path(std::getenv("HOME")) / "Library" / "Application Support"
+    : os == Platform::Linux
+      ? fs::path(std::getenv("HOME")) / ".local" / "share"
+      : os == Platform::Android
+        ? fs::path(std::getenv("EXTERNAL_STORAGE"))
+        : os == Platform::iOS
+          ? fs::path(std::getenv("HOME")) / "Library" / "Application Support"
+          : fs::path();
+
 
 }

@@ -22,6 +22,8 @@
 #include "ams/game/Camera.hpp"
 #include "ams/game/Behavior.hpp"
 #include "ams/game/Application.hpp"
+#include "ams/game/Components/MeshComponent.hpp"
+
 
 #else
 import ams.game.Scene;
@@ -73,6 +75,12 @@ Entity* Scene::createEntity(const std::string& name, Transform* parent) {
   _entities[upEntity->id] = std::move(upEntity);
   for (auto* behavior : pEntity->_behaviors)
     registerBehavior(behavior);
+  return pEntity;
+}
+
+Entity* Scene::createEntity(const std::string& name, EntityCfg cfg, Transform* parent) {
+  auto pEntity = createEntity(name, parent);
+  autoConfigureEntity(pEntity, cfg);
   return pEntity;
 }
 
@@ -199,6 +207,23 @@ std::vector<Entity*> Scene::getEntities() const {
   for (auto& [id, entity] : _entities)
     entities.push_back(entity.get());
   return entities;
+}
+
+void Scene::autoConfigureEntity(Entity* entity, EntityCfg cfg) {
+  switch(cfg) {
+    case EntityCfg::Default:
+      defaultcfg:
+      break;
+    case EntityCfg::Camera:
+      entity->addComponent<Camera>();
+      break;
+    case EntityCfg::Mesh:
+      entity->addComponent<MeshComponent>();
+      break;
+    // TODO: add more configurations
+    default:
+      goto defaultcfg;
+  }
 }
 
 } // ams

@@ -22,19 +22,19 @@
 /*[export module ams.Mesh]*/
 /*[exclude begin]*/
 #pragma once
-#include "ams/spatial/internal/config.hpp"
-#include "ams/spatial/Vec.hpp"
+#include <ams/Serializable.hpp>
+#include <ams/spatial/internal/config.hpp>
+#include <ams/spatial/Vec.hpp>
 #include "Object.hpp"
-#include "ISerializable.hpp"
 /*[exclude end]*/
 #include <string>
 #include <vector>
 #include <map>
 #include <filesystem>
+/*[import ams.Serializable]*/
 /*[import ams.spatial.internal.config]*/
 /*[import ams.spatial.Vec]*/
 /*[import ams.game.Object]*/
-/*[import ams.game.ISerializable]*/
 
 /*[export]*/ namespace ams {
 
@@ -79,7 +79,7 @@ struct AMS_GAME_EXPORT Face {
 /**
  * @brief A mesh is a collection of vertices and indices that can be rendered.
  */
-class AMS_GAME_EXPORT Mesh : public Object, public ISerializable<Mesh> {
+class AMS_GAME_EXPORT Mesh : public Object, public Serializable {
 public:
   inline static const std::string ams_file_header = "ams_mesh";
   inline static const std::string ams_file_version = "1";
@@ -312,9 +312,7 @@ public:
   
 #pragma endregion Getters
   
-  virtual void deserialize(const std::string& data) override;
-  
-  virtual std::string serialize() const override;
+
   
 public:
   /**
@@ -351,7 +349,8 @@ public:
     }
     return fileTypes;
   }
-  
+
+  static normals_t generateNormals(vertices_t vts, faces_t faces);
 };
 
 } // ams

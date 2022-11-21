@@ -31,6 +31,7 @@ import ams.game.Util;
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_to_string.hpp>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include <iostream>
 #include <optional>
@@ -42,6 +43,77 @@ import ams.game.Util;
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 namespace ams::internal {
+
+using DebugSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
+using DebugType = vk::DebugUtilsMessageTypeFlagBitsEXT;
+
+struct DebugConfig {
+  const bool enabled = AMSGraphicsDebug;
+  const bool enableValidationLayers = AMSGraphicsDebug;
+  const std::vector<const char*> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"
+  };
+  /** device extensions required for debugging */
+  const std::vector<const char*> deviceExtensions = {
+    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+    VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+  };
+  const vk::DebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo = {
+    .sType = vk::StructureType::eDebugUtilsMessengerCreateInfoEXT,
+    .messageSeverity = DebugSeverity::eVerbose | DebugSeverity::eInfo | DebugSeverity::eWarning | DebugSeverity::eError,
+    .messageType = DebugType::eGeneral | DebugType::ePerformance | DebugType::eValidation,
+    .pfnUserCallback = defaultDebugCallback,
+  };
+
+  inline static constexpr DebugSeverity debugSeverity = 
+    AMSGraphicsDebugSeverity < GraphicsDebugSeverity::Warning
+      ? DebugSeverity::eError
+      : AMSGraphicsDebugSeverity < GraphicsDebugSeverity::Info
+        ? DebugSeverity::eWarning
+        : AMSGraphicsDebugSeverity < GraphicsDebugSeverity::Debug
+          ? DebugSeverity::eInfo : DebugSeverity::eVerbose;
+
+  inline static VKAPI_ATTR
+  VkBool32 VKAPI_CALL defaultDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                           VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+                                           VkDebugUtilsMessengerCallbackDataEXT const* pCallbackData,
+                                           void* /*pUserData*/ ) {
+    std::ostringstream message;
+    message << vk::to_string(static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>( messageSeverity )) << ": "
+            << vk::to_string(static_cast<vk::DebugUtilsMessageTypeFlagsEXT>( messageTypes )) << ":" << std::endl;
+    message << std::string("\t") << "messageIDName   = <" << pCallbackData->pMessageIdName << ">" << std::endl;
+    message << std::string("\t") << "messageIdNumber = " << pCallbackData->messageIdNumber << std::endl;
+    message << std::string("\t") << "message         = <" << pCallbackData->pMessage << std::endl;
+    if (0 < pCallbackData->queueLabelCount) {
+      message << std::string("\t") << "Queue Labels:" << std::endl;
+      for (uint32_t i = 0; i < pCallbackData->queueLabelCount; i++) {
+        message << std::string("\t\t") << "labelName = <" << pCallbackData->pQueueLabels[i].pLabelName << ">" << std::endl;
+      }
+    }
+    if (0 < pCallbackData->cmdBufLabelCount) {
+      message << std::string("\t") << "CommandBuffer Labels:" << std::endl;
+      for (uint32_t i = 0; i < pCallbackData->cmdBufLabelCount; i++) {
+        message << std::string("\t\t") << "labelName = <" << pCallbackData->pCmdBufLabels[i].pLabelName << ">" << std::endl;
+      }
+    }
+    if (0 < pCallbackData->objectCount) {
+      message << std::string("\t") << "Objects:" << std::endl;
+      for (uint32_t i = 0; i < pCallbackData->objectCount; i++) {
+        message << std::string("\t\t") << "Object " << i << std::endl;
+        message << std::string("\t\t\t") << "objectType   = "
+                << vk::to_string(static_cast<vk::ObjectType>( pCallbackData->pObjects[i].objectType )) << std::endl;
+        message << std::string("\t\t\t") << "objectHandle = " << pCallbackData->pObjects[i].objectHandle << std::endl;
+        if (pCallbackData->pObjects[i].pObjectName) {
+          message << std::string("\t\t\t") << "objectName   = <" << pCallbackData->pObjects[i].pObjectName << ">"  << std::endl;
+        }
+      }
+    }
+    if (static_cast<DebugSeverity>(messageSeverity) >= debugSeverity)
+      std::cout << message.str() << std::endl;
+    return false;
+  }
+};
+
 
 struct QueueFamilyIndices {
   std::optional<uint32_t> graphicsFamily;
@@ -58,12 +130,31 @@ struct SwapChainSupportDetails {
   std::vector<vk::PresentModeKHR> presentModes;
 };
 
+struct DepthBuffer {
+  vk::Image image;
+  vk::Format format;
+  vk::DeviceMemory memory;
+  vk::ImageView view;
+};
+
+struct DataBuffer {
+  size_t size;
+  vk::Buffer buffer;
+  vk::DeviceMemory memory;
+  vk::BufferUsageFlagBits usage;
+  vk::Flags<vk::MemoryPropertyFlagBits> memoryPropertyFlags;
+};
+
+
+
+
+
 struct AMS_GAME_EXPORT RendererVulkan::Impl {
   Window* window;
   // vulkan application info
   vk::ApplicationInfo _applicationInfo;
   // glfw required extensions
-  std::vector<const char*> glfwExtensions;
+  std::vector<const char*> enabledExtensions;
 
   // required vulkan device extensions
   const std::vector<const char*> requiredDeviceExtensions {
@@ -105,12 +196,13 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
   // vulkan extent
   vk::Extent2D extent;
 
-  // vulkan depth image
-  vk::Image depthImage;
-  // vulkan depth image memory
-  vk::DeviceMemory depthImageMemory;
-  // vulkan depth image view
-  vk::ImageView depthImageView;
+  // vulkan depth buffer
+  DepthBuffer depthBuffer;
+  
+  DataBuffer uniformBuffer;
+  vk::DescriptorPool descriptorPool;
+  vk::DescriptorSetLayout descriptorSetLayout;
+  vk::DescriptorSet descriptorSet;
 
   // vulkan render pass
   vk::RenderPass renderPass;
@@ -126,31 +218,12 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
   // vulkan fences
   std::vector<vk::Fence> inFlightFences;
   std::vector<vk::Fence> imagesInFlight;
-  
-  const bool enableValidationLayers = AMSGraphicsDebug;
-  const std::vector<const char*> validationLayers = {
-    // standard validation layer
-    "VK_LAYER_KHRONOS_validation",
-  };
-  
-  const bool enableDebugUtils = AMSGraphicsDebug;
-  vk::DebugUtilsMessengerEXT debugMessenger;
-  using DebugSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
-  inline static DebugSeverity debugMinimumSeverity = DebugSeverity::eWarning;
-  
-  const vk::DebugUtilsMessengerCreateInfoEXT defaultDebugMessengerCreateInfo {
-    .messageSeverity = DebugSeverity::eVerbose | DebugSeverity::eWarning | DebugSeverity::eError,
-    .messageType = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
-    .pfnUserCallback = debugCallback,
-    .pUserData = nullptr,
-  };
 
-  const vk::DebugUtilsMessengerCreateInfoEXT defaultDebugUtilsMessengerCreateInfo {  
-    .sType = vk::StructureType::eDebugUtilsMessengerCreateInfoEXT,
-    .messageSeverity = DebugSeverity::eVerbose | DebugSeverity::eWarning | DebugSeverity::eError,
-    .messageType = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
-    .pfnUserCallback = debugCallback,
-  };
+  
+  const DebugConfig dbgCfg;
+  
+  vk::DebugUtilsMessengerEXT debugMessenger;
+
 
   bool _isInitialized = false;
   
@@ -166,18 +239,55 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
       .engineVersion = appInfo.engineVersion,
       .apiVersion = VK_API_VERSION_1_3
     };
-    glfwExtensions = getRequiredExtensions();
+    enabledExtensions = getRequiredExtensions();
     // create vulkan instance
     if (!createInstance())
       _isInitialized = false;
+  }
+
+  /**
+   * @brief Step 1 of vulkan initialization.
+   * Creates the vulkan instance.
+   */
+  bool createInstance() {
+    // get vulkan instance process address
+    vk::DynamicLoader dl;
+    PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = dl.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr); // initialize vulkan-hpp dispatcher
+    vk::InstanceCreateInfo instanceCreateInfo {
+      .pApplicationInfo = &_applicationInfo,
+      .enabledExtensionCount = static_cast<uint32_t>(enabledExtensions.size()),
+      .ppEnabledExtensionNames = enabledExtensions.data()
+    };
+    if (dbgCfg.enableValidationLayers && !checkValidationLayerSupport()) {
+      return throwOrDefault<std::runtime_error, bool>("validation layers requested, but not available!", false);
+    } else if (dbgCfg.enableValidationLayers) {
+      instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(dbgCfg.validationLayers.size());
+      instanceCreateInfo.ppEnabledLayerNames = dbgCfg.validationLayers.data();
+    }
+    if (dbgCfg.enabled)
+      instanceCreateInfo.pNext = &dbgCfg.debugUtilsMessengerCreateInfo;
+    try {
+      instance = vk::createInstance(instanceCreateInfo, nullptr);
+      // initialize instance with dynamic dispatcher.
+      VULKAN_HPP_DEFAULT_DISPATCHER.init(instance); // Calling instance methods will result in undefined behavior without this.
+      _isInitialized = true;
+    } catch (const vk::SystemError& err) {
+      return false;
+    }
+    if (dbgCfg.enabled)
+      if (createDebugUtilsMessengerEXT(instance, &dbgCfg.debugUtilsMessengerCreateInfo, nullptr, &debugMessenger) != vk::Result::eSuccess)
+        return throwOrDefault<std::runtime_error, bool>("failed to set up debug messenger!", false);
+    return true;
   }
   
   std::vector<const char*> getRequiredExtensions() {
     uint32_t glfwExtensionCount = 0;
     const char** pGlfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
     std::vector<const char*> extensions(pGlfwExtensions, pGlfwExtensions + glfwExtensionCount);
-    if (enableDebugUtils) { // add a debug messenger
-      extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    if (dbgCfg.enabled) { // add a debug messenger
+      // emplace all debugConfig.deviceExtensions
+      extensions.insert(extensions.end(), dbgCfg.deviceExtensions.begin(), dbgCfg.deviceExtensions.end());
     }
     return extensions;
   }
@@ -194,14 +304,14 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
       _isInitialized = false;
       return _isInitialized;
     }
-    surface = std::move(*surf);
+    surface = *surf;
     // pick physical device
     auto dev = choosePhysicalDevice(surface);
     if (!dev.has_value()) {
       _isInitialized = false;
       return _isInitialized;
     }
-    physicalDevice = std::move(*dev);
+    physicalDevice = *dev;
     indices = findQueueFamilies(physicalDevice, surface);
     // create vulkan device
     auto lodev = createLogicalDevice(physicalDevice, indices);
@@ -209,8 +319,15 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
       _isInitialized = false;
       return _isInitialized;
     }
-    device = std::move(*lodev);
+    device = *lodev;
     graphicsQueue = device.getQueue(indices.graphicsFamily.value(), 0);
+    auto ubuf = createUniformBuffer(physicalDevice, device);
+    if (!ubuf.has_value()) {
+      _isInitialized = false;
+      return _isInitialized;
+    }
+    uniformBuffer = *ubuf;
+    // TODO: https://github.com/KhronosGroup/Vulkan-Hpp/blob/f461105d147e52b246f5227607eb9910febacf0c/samples/07_InitUniformBuffer/07_InitUniformBuffer.cpp#L74
     
     _isInitialized = true;
     return _isInitialized;
@@ -223,7 +340,7 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
     if (!_isInitialized)
       return false;
     // destroy old resources
-    destroyDeviceResources();
+    destroyDeviceGraphicsResources();
     // create vulkan swapchain
     auto scs = querySwapChainSupport(physicalDevice, surface); // swap chain support
     auto swap = createSwapchain(device, indices, scs);
@@ -236,8 +353,10 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
     setImageViews(device, swapchainImages, swapchainImageFormat, swapchainImageViews);
 
     // create depth buffer
-    if (!createDepthBuffer(physicalDevice, device))
+    auto depth = createDepthBuffer(physicalDevice, device);
+    if (!depth.has_value())
       return false;
+    depthBuffer = std::move(*depth);
     // create render pass
     if (!createRenderPass())
       return false;
@@ -247,7 +366,9 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
   bool shutdown() {
     if (!_isInitialized)
       return false;
-    if (!destroyDeviceResources())
+    if (!destroyDeviceGraphicsResources())
+      return false;
+    if (!destroyDeviceDataResources())
       return false;
     // destroy device
     if (device)
@@ -255,7 +376,7 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
     // destroy surface
     instance.destroySurfaceKHR(surface);
     // destroy debug messenger
-    if (enableDebugUtils)
+    if (dbgCfg.enabled)
       destroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     // destroy instance
     instance.destroy();
@@ -263,7 +384,18 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
     return true;
   }
   
-  bool destroyDeviceResources() {
+  bool destroyDeviceDataResources() {
+    if (!_isInitialized)
+      return false;
+    // destroy uniform buffer
+    if (uniformBuffer.buffer) {
+      device.freeMemory(uniformBuffer.memory);
+      device.destroyBuffer(uniformBuffer.buffer);
+    }
+    return true;
+  }
+  
+  bool destroyDeviceGraphicsResources() {
     if (!_isInitialized)
       return false;
     // wait for device to finish
@@ -273,94 +405,62 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
       device.destroySemaphore(imageAvailableSemaphore);
     if (renderFinishedSemaphore)
       device.destroySemaphore(renderFinishedSemaphore);
+    // destroy framebuffers if they exist
+    for (auto& framebuffer : framebuffers)
+      device.destroyFramebuffer(framebuffer);
     // destroy command buffers if they exist
-    if (commandBuffers.size() > 0)
+    if (commandPool)
       device.freeCommandBuffers(commandPool, commandBuffers);
     // destroy command pool if it exists
     if (commandPool)
       device.destroyCommandPool(commandPool);
-    // destroy framebuffers if they exist
-    for (auto& framebuffer: framebuffers)
-      device.destroyFramebuffer(framebuffer);
     // destroy render pass if it exists
     if (renderPass)
       device.destroyRenderPass(renderPass);
-    // destroy swapchain image views if they exist
-    for (auto& imageView: swapchainImageViews)
+    // destroy depth buffer if it exists
+    if (depthBuffer.view)
+      device.destroyImageView(depthBuffer.view);
+    if (depthBuffer.image)
+      device.destroyImage(depthBuffer.image);
+    if (depthBuffer.memory)
+      device.freeMemory(depthBuffer.memory);
+    // destroy swapchain if it exists
+    if (swapchain)
+      device.destroySwapchainKHR(swapchain);
+    // destroy image views if they exist
+    for (auto& imageView : swapchainImageViews)
       device.destroyImageView(imageView);
-    // destroy depth image view if it exists
-    if (depthImageView)
-      device.destroyImageView(depthImageView);
-    // destroy depth image if it exists
-    if (depthImage)
-      device.destroyImage(depthImage);
-    // destroy depth image memory if it exists
-    if (depthImageMemory)
-      device.freeMemory(depthImageMemory);
     return true;
   }
 
-  bool setupDebugMessenger() {
-    if (!enableDebugUtils)
+  bool setupDebugMessenger(vk::Instance& inst) {
+    if (!dbgCfg.enabled)
       return false;
-    vk::DebugUtilsMessengerCreateInfoEXT createInfo = defaultDebugUtilsMessengerCreateInfo;
-    if (createDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != vk::Result::eSuccess) {
+    vk::DebugUtilsMessengerCreateInfoEXT createInfo = dbgCfg.debugUtilsMessengerCreateInfo;
+    if (createDebugUtilsMessengerEXT(inst, &createInfo, nullptr, &debugMessenger) != vk::Result::eSuccess) {
       return false;
     }
     return true;
   }
 
-  vk::Result createDebugUtilsMessengerEXT(vk::Instance inst, const vk::DebugUtilsMessengerCreateInfoEXT* pCreateInfo, const vk::AllocationCallbacks* pAllocator, vk::DebugUtilsMessengerEXT* pDebugUtilsMessenger) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) inst.getProcAddr("vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-      return static_cast<vk::Result>(func(inst, reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT*>(pCreateInfo), reinterpret_cast<const VkAllocationCallbacks*>(pAllocator), reinterpret_cast<VkDebugUtilsMessengerEXT*>(pDebugUtilsMessenger)));
-    } else {
+  vk::Result createDebugUtilsMessengerEXT(vk::Instance& inst, const vk::DebugUtilsMessengerCreateInfoEXT* pCreateInfo, const vk::AllocationCallbacks* pAllocator, vk::DebugUtilsMessengerEXT* pDebugUtilsMessenger) {
+    auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(inst.getProcAddr("vkCreateDebugUtilsMessengerEXT"));
+    if (!func)
       return vk::Result::eErrorExtensionNotPresent;
-    }
+    return static_cast<vk::Result>(
+      func(inst,
+           reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT*>(pCreateInfo),
+           reinterpret_cast<const VkAllocationCallbacks*>(pAllocator),
+           reinterpret_cast<VkDebugUtilsMessengerEXT*>(pDebugUtilsMessenger)
+       )
+    );
   }
 
-  void destroyDebugUtilsMessengerEXT(vk::Instance inst, vk::DebugUtilsMessengerEXT debugUtilsMessenger, const vk::AllocationCallbacks* pAllocator) {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) inst.getProcAddr("vkDestroyDebugUtilsMessengerEXT");
+  void destroyDebugUtilsMessengerEXT(vk::Instance& inst, vk::DebugUtilsMessengerEXT debugUtilsMessenger, const vk::AllocationCallbacks* pAllocator) {
+    auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(inst.getProcAddr("vkDestroyDebugUtilsMessengerEXT"));
     if (func != nullptr) {
       func(inst, debugUtilsMessenger, reinterpret_cast<const VkAllocationCallbacks*>(pAllocator));
     }
-  }
-  
-  /**
-   * @brief Step 1 of vulkan initialization.
-   * Creates the vulkan instance.
-   */
-  bool createInstance() {
-    // get vulkan instance process address
-    vk::DynamicLoader dl;
-    PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = dl.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
-    VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr); // initialize vulkan-hpp dispatcher
-    vk::InstanceCreateInfo instanceCreateInfo {
-      .pApplicationInfo = &_applicationInfo,
-      .enabledExtensionCount = static_cast<uint32_t>(glfwExtensions.size()),
-      .ppEnabledExtensionNames = glfwExtensions.data()
-    };
-    if (enableValidationLayers && !checkValidationLayerSupport()) {
-      return throwOrDefault<std::runtime_error, bool>("validation layers requested, but not available!", false);
-    } else if (enableValidationLayers) {
-      instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-      instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
-    }
-    auto  debugMessengerCreateInfo = defaultDebugUtilsMessengerCreateInfo;
-    if (enableDebugUtils)
-      instanceCreateInfo.pNext = &debugMessengerCreateInfo;
-    try {
-      instance = vk::createInstance(instanceCreateInfo, nullptr);
-      // initialize instance with dynamic dispatcher.
-      VULKAN_HPP_DEFAULT_DISPATCHER.init(instance); // Calling instance methods will result in undefined behavior without this.
-      _isInitialized = true;
-    } catch (const vk::SystemError& err) {
-      return false;
-    }
-    if (enableDebugUtils)
-        if (createDebugUtilsMessengerEXT(instance, &debugMessengerCreateInfo, nullptr, &debugMessenger) != vk::Result::eSuccess)
-          return throwOrDefault<std::runtime_error, bool>("failed to set up debug messenger!", false);
-    return true;
   }
 
   /**
@@ -409,11 +509,10 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
    * @brief Creates the logical device.
    * This depends choosePhysicalDevice() being called first.
    */
-  std::optional<vk::Device> createLogicalDevice(vk::PhysicalDevice& dev, const QueueFamilyIndices& indices) const {
+  std::optional<vk::Device> createLogicalDevice(vk::PhysicalDevice& dev, const QueueFamilyIndices& ind) const {
     // create the queue create infos
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
-    float queuePriority = 1.0f;
+    std::set<uint32_t> uniqueQueueFamilies = {ind.graphicsFamily.value(), ind.presentFamily.value()};
     for (uint32_t queueFamily : uniqueQueueFamilies) {
       vk::DeviceQueueCreateInfo queueCreateInfo {
         .queueFamilyIndex = queueFamily,
@@ -431,9 +530,9 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
       .enabledExtensionCount = static_cast<uint32_t>(requiredDeviceExtensions.size()),
       .ppEnabledExtensionNames = requiredDeviceExtensions.data(),
     };
-    if (enableValidationLayers) {
-      deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-      deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+    if (dbgCfg.enableValidationLayers) {
+      deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(dbgCfg.validationLayers.size());
+      deviceCreateInfo.ppEnabledLayerNames = dbgCfg.validationLayers.data();
     }
     // create the logical device
     auto ret = dev.createDevice(deviceCreateInfo);
@@ -442,9 +541,37 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
   }
   
   /**
+   * @brief Creates the uniform buffer.
+   */
+   std::optional<DataBuffer> createUniformBuffer(vk::PhysicalDevice& dev, vk::Device& lodev) const {
+    DataBuffer ret;
+    ret.size = sizeof(glm::mat4);
+    ret.usage = vk::BufferUsageFlagBits::eUniformBuffer;
+    ret.memoryPropertyFlags = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
+    vk::BufferCreateInfo bufferInfo {
+      .flags = vk::BufferCreateFlags(),
+      .size = ret.size,
+      .usage = ret.usage,
+      .sharingMode = vk::SharingMode::eExclusive
+    };
+    ret.buffer = lodev.createBuffer(bufferInfo);
+    auto memRequirements = lodev.getBufferMemoryRequirements(ret.buffer);
+    auto memType = findMemoryType(dev.getMemoryProperties(), memRequirements.memoryTypeBits, ret.memoryPropertyFlags);
+    if (memType == -1)
+      return throwOrDefault<std::runtime_error, std::optional<DataBuffer>>("failed to find suitable memory type!", std::nullopt);
+    ret.memory = lodev.allocateMemory(vk::MemoryAllocateInfo {
+      .allocationSize = memRequirements.size,
+      .memoryTypeIndex = memType
+    });
+    lodev.bindBufferMemory(ret.buffer, ret.memory, 0);
+    return ret;
+  }
+   
+  
+  /**
    * @brief Creates the swapchain.
    */
-  std::optional<vk::SwapchainKHR> createSwapchain(vk::Device& dev, const QueueFamilyIndices& indices, const SwapChainSupportDetails& scs) const {
+  std::optional<vk::SwapchainKHR> createSwapchain(vk::Device& dev, const QueueFamilyIndices& ind, const SwapChainSupportDetails& scs) const {
     auto extent = getSwapExtent(scs.capabilities); // swap extent
     if (scs.formats.empty())
       return throwOrDefault<std::runtime_error, std::optional<vk::SwapchainKHR>>(
@@ -482,9 +609,9 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
       .presentMode = surfacePresentMode,
       .clipped = true,
     };
-    uint32_t qfi[2] = { indices.graphicsFamily.value(),
-                        indices.presentFamily.value() }; // queue family indices
-    if ( indices.graphicsFamily != indices.presentFamily ) {
+    uint32_t qfi[2] = { ind.graphicsFamily.value(),
+                        ind.presentFamily.value() }; // queue family indices
+    if ( ind.graphicsFamily != ind.presentFamily ) {
       // If the graphics and present queues are from different queue families, we either have to explicitly transfer
       // ownership of images between the queues, or we have to create the swapchain with imageSharingMode as
       // VK_SHARING_MODE_CONCURRENT
@@ -523,14 +650,14 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
    * @param dev The physical device.
    * @param lodev The logical device.
    */
-  bool createDepthBuffer(const vk::PhysicalDevice& dev, vk::Device& lodev) {
-    // destroy the old depth buffer if it exists
-    if (depthImage)
-      lodev.destroyImage(depthImage);
-    if (depthImageMemory)
-      lodev.freeMemory(depthImageMemory);
-    if (depthImageView)
-      lodev.destroyImageView(depthImageView);
+  std::optional<DepthBuffer> createDepthBuffer(const vk::PhysicalDevice& dev, vk::Device& lodev) {
+    // destroy the old depth buffer if it exists TODO
+//    if (depthBuffer.image)
+//      lodev.destroyImage(depthBuffer.image);
+//    if (depthBuffer.memory)
+//      lodev.freeMemory(depthBuffer.memory);
+//    if (depthBuffer.view)
+//      lodev.destroyImageView(depthBuffer.view);
     // get the depth format
     auto format = vk::Format::eD16Unorm;
     auto formatProperties = dev.getFormatProperties(format);
@@ -540,7 +667,8 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
     } else if (formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) {
       tiling = vk::ImageTiling::eOptimal;
     } else {
-      return throwOrDefault<std::runtime_error, bool>("Depth format does not support depth stencil attachment!", false);
+      return throwOrDefault<std::runtime_error, std::optional<DepthBuffer>>(
+        "Depth format does not support depth stencil attachment!", std::nullopt);
     }
     auto imageCreateInfo = vk::ImageCreateInfo {
       .imageType = vk::ImageType::e2D,
@@ -556,9 +684,16 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
       .pQueueFamilyIndices = nullptr,
       .initialLayout = vk::ImageLayout::eUndefined
     };
-    depthImage = lodev.createImage(imageCreateInfo);
+    DepthBuffer ret {
+      .image = lodev.createImage(imageCreateInfo),
+      .format = format
+    };
+    vk::MemoryRequirements memoryRequirements = lodev.getImageMemoryRequirements(ret.image);
+    auto typeIndex = findMemoryType(dev.getMemoryProperties(), memoryRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+    
+    /*
     auto memoryProperties = dev.getMemoryProperties();
-    vk::MemoryRequirements memoryRequirements = lodev.getImageMemoryRequirements(depthImage);
+    vk::MemoryRequirements memoryRequirements = lodev.getImageMemoryRequirements(ret.image);
     auto typeBits = memoryRequirements.memoryTypeBits;
     auto typeIndex = uint32_t(~0);
     for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
@@ -569,22 +704,23 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
         }
       }
       typeBits >>= 1;
-    }
+    }*/
     if (typeIndex == uint32_t(~0))
-      return throwOrDefault<std::runtime_error, bool>("Could not find a memory type index that supports device local memory!", false);
-    depthImageMemory = lodev.allocateMemory(vk::MemoryAllocateInfo{
+      return throwOrDefault<std::runtime_error, std::optional<DepthBuffer>>(
+        "Could not find a memory type index that supports device local memory!", std::nullopt);
+    ret.memory = lodev.allocateMemory(vk::MemoryAllocateInfo{
       .allocationSize = memoryRequirements.size,
       .memoryTypeIndex = typeIndex
     });
-    lodev.bindImageMemory(depthImage, depthImageMemory, 0);
-    depthImageView = lodev.createImageView(vk::ImageViewCreateInfo{
-      .image = depthImage,
+    lodev.bindImageMemory(ret.image, ret.memory, 0);
+    ret.view = lodev.createImageView(vk::ImageViewCreateInfo{
+      .image = ret.image,
       .viewType = vk::ImageViewType::e2D,
-      .format = format,
+      .format = ret.format,
       .components = {},
       .subresourceRange = {vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1}
     });
-    return true;
+    return ret;
   }
   
   /**
@@ -601,7 +737,7 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
    */
   bool checkValidationLayerSupport() {
     auto availableLayers = vk::enumerateInstanceLayerProperties();
-    for (const char* layerName : validationLayers) {
+    for (const char* layerName : dbgCfg.validationLayers) {
       bool layerFound = false;
       for (const auto& layerProperties : availableLayers) {
         if (strcmp(layerName, layerProperties.layerName) == 0) {
@@ -620,22 +756,41 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
  * @param dev - the device to find the queue family indices for.
  */
   QueueFamilyIndices findQueueFamilies(const vk::PhysicalDevice& dev, const vk::SurfaceKHR& surf) const {
-    QueueFamilyIndices indices;
+    QueueFamilyIndices ret;
     auto queueFamilyProperties = dev.getQueueFamilyProperties();
     int i = 0;
     for (const auto& queueFamily : queueFamilyProperties) {
       // check if the queue family supports graphics
       if (queueFamily.queueCount > 0 && queueFamily.queueFlags & vk::QueueFlagBits::eGraphics)
-        indices.graphicsFamily = i;
+        ret.graphicsFamily = i;
       vk::Bool32 presentSupport = false;
       auto result = dev.getSurfaceSupportKHR(i, surf, &presentSupport);
       if (queueFamily.queueCount > 0 && presentSupport)
-        indices.presentFamily = i;
-      if (indices.isComplete())
+        ret.presentFamily = i;
+      if (ret.isComplete())
         break;
       i++;
     }
-    return indices;
+    return ret;
+  }
+  
+  /**
+   * @brief Finds the memory type index.
+   * @param memoryProperties - the memory properties to search.
+   * @param typeBits - the type bits to search for.
+   * @param requirementsMask - the requirements mask.
+   * @return the memory type index. If no memory type index is found, then ~0 (-1) is returned.
+   */
+  uint32_t findMemoryType(const vk::PhysicalDeviceMemoryProperties& memoryProperties, uint32_t typeBits, vk::MemoryPropertyFlags requirementsMask) const {
+    for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
+      if ((typeBits & 1) == 1) {
+        if ((memoryProperties.memoryTypes[i].propertyFlags & requirementsMask) == requirementsMask) {
+          return i;
+        }
+      }
+      typeBits >>= 1;
+    }
+    return uint32_t(~0);
   }
   
   /**
@@ -654,7 +809,6 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
     auto indicies = findQueueFamilies(dev, surf);
     return indicies.isComplete();
   }
-
 
   /**
    * @brief Checks for required extensions.
@@ -724,63 +878,6 @@ struct AMS_GAME_EXPORT RendererVulkan::Impl {
 
   }
   
-//  static VKAPI_ATTR VkBool32 VKAPI_CALL
-//  debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-//    // cast severity to vulkan-hpp enum
-//    DebugSeverity severity = static_cast<DebugSeverity>(messageSeverity);
-//    if (severity < debugMinimumSeverity)
-//      return VK_FALSE;
-//    if (severity > DebugSeverity::eWarning)
-//      std::cerr << "[ERROR] validation layer: " << pCallbackData->pMessage << std::endl;
-//    else if (severity > DebugSeverity::eInfo)
-//      std::cerr << "[WARNING] validation layer: " << pCallbackData->pMessage << std::endl;
-//    else if (severity > DebugSeverity::eVerbose)
-//      std::cout << "[INFO] validation layer: " << pCallbackData->pMessage << std::endl;
-//    else
-//      std::cout << "[DEBUG] validation layer: " << pCallbackData->pMessage << std::endl;
-//    return VK_FALSE;
-//  }
-
-  static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                                                      VkDebugUtilsMessageTypeFlagsEXT messageTypes,
-                                                      VkDebugUtilsMessengerCallbackDataEXT const* pCallbackData,
-                                                      void* /*pUserData*/ ) {
-    std::ostringstream message;
-    message << vk::to_string(static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>( messageSeverity )) << ": "
-            << vk::to_string(static_cast<vk::DebugUtilsMessageTypeFlagsEXT>( messageTypes )) << ":\n";
-    message << std::string("\t") << "messageIDName   = <" << pCallbackData->pMessageIdName << ">\n";
-    message << std::string("\t") << "messageIdNumber = " << pCallbackData->messageIdNumber << "\n";
-    message << std::string("\t") << "message         = <" << pCallbackData->pMessage << ">\n";
-    if (0 < pCallbackData->queueLabelCount) {
-      message << std::string("\t") << "Queue Labels:\n";
-      for (uint32_t i = 0; i < pCallbackData->queueLabelCount; i++) {
-        message << std::string("\t\t") << "labelName = <" << pCallbackData->pQueueLabels[i].pLabelName << ">\n";
-      }
-    }
-    if (0 < pCallbackData->cmdBufLabelCount) {
-      message << std::string("\t") << "CommandBuffer Labels:\n";
-      for (uint32_t i = 0; i < pCallbackData->cmdBufLabelCount; i++) {
-        message << std::string("\t\t") << "labelName = <" << pCallbackData->pCmdBufLabels[i].pLabelName << ">\n";
-      }
-    }
-    if (0 < pCallbackData->objectCount) {
-      message << std::string("\t") << "Objects:\n";
-      for (uint32_t i = 0; i < pCallbackData->objectCount; i++) {
-        message << std::string("\t\t") << "Object " << i << "\n";
-        message << std::string("\t\t\t") << "objectType   = "
-                << vk::to_string(static_cast<vk::ObjectType>( pCallbackData->pObjects[i].objectType )) << "\n";
-        message << std::string("\t\t\t") << "objectHandle = " << pCallbackData->pObjects[i].objectHandle << "\n";
-        if (pCallbackData->pObjects[i].pObjectName) {
-          message << std::string("\t\t\t") << "objectName   = <" << pCallbackData->pObjects[i].pObjectName << ">\n";
-        }
-      }
-    }
-    if (static_cast<DebugSeverity>(messageSeverity) >= debugMinimumSeverity)
-      std::cout << message.str() << std::endl;
-    return false;
-  }
-  
-  
 };
 
 
@@ -800,7 +897,7 @@ bool RendererVulkan::init() {
 
 
 void RendererVulkan::shutdown() {
-  pImpl->shutdown(); // TODO
+//  pImpl->shutdown(); // TODO
 //  pImpl->destroyDeviceResources();
 }
 
@@ -826,4 +923,3 @@ vk::Instance RendererVulkan::getInstance() const {
 }
 
 } // ams
-

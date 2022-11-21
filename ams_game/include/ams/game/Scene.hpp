@@ -15,14 +15,15 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /*[module]*/
-
+/*[exclude begin]*/
+#pragma once
+/*[exclude end]*/
 /*[ignore begin]*/
 #include "ams_game_export.hpp"
 /*[ignore end]*/
 
 /*[export module ams.game.Scene]*/
 /*[exclude begin]*/
-#pragma once
 #include "config.hpp"
 #include "Object.hpp"
 #include "Camera.hpp"
@@ -34,6 +35,19 @@
 /*[import ams.game.Object]*/
 /*[import ams.game.Camera]*/
 /*[import ams.game.Entity]*/
+
+enum class EntityCfg {
+  Camera,
+  Mesh,
+  Light,
+  Skybox,
+  Terrain,
+  Water,
+  Particle,
+  Audio,
+  Physics,
+  Default
+};
 
 /*[export]*/ namespace ams {
 
@@ -92,6 +106,14 @@ public:
   Entity* createEntity(const std::string& name, Transform* parent);
   
   /**
+   * @brief Creates a Entity in the Scene.
+   * @param name The name of the Entity.
+   * @param parent The parent Entity of the Entity.
+   * @param cfg The configuration of the Entity.
+   */
+  Entity* createEntity(const std::string& name, EntityCfg cfg = EntityCfg::Default, Transform* parent = nullptr);
+  
+  /**
    * @brief Destroys a Entity in the Scene. The same as Entity::destroy().
    * @param entity The Entity to destroy.
    * @return true if the Entity was destroyed, false otherwise.
@@ -142,6 +164,9 @@ private:
    * @return true if successful, false if Entity was not registered.
    */
   [[maybe_unused]] bool unregisterCamera(Camera* camera);
+  
+  /** Modifies an Entity to conform to a configuration */
+  static void autoConfigureEntity(Entity* entity, EntityCfg cfg);
 
 public:
   friend class Application;

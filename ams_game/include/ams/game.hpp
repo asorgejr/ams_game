@@ -18,7 +18,8 @@
 /*[module]*/
 /*[exclude begin]*/
 #pragma once
-#include "game/Platform.hpp"
+#include "game/SystemInfo.hpp"
+#include "game/Object.hpp"
 #include "game/Entity.hpp"
 #include "game/Transform.hpp"
 #include "game/Behavior.hpp"
@@ -27,7 +28,8 @@
 #include "game/Application.hpp"
 /*[exclude end]*/
 /*[export module ams.spatial]*/
-/*[export import ams.game.Platform]*/
+/*[export import ams.game.SystemInfo]*/
+/*[export import ams.game.Object]*/
 /*[export import ams.game.Entity]*/
 /*[export import ams.game.Transform]*/
 /*[export import ams.game.Behavior]*/

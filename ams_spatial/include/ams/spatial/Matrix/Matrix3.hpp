@@ -23,6 +23,7 @@
 /*[exclude end]*/
 /*[ignore begin]*/
 #include "ams_spatial_export.hpp"
+#include <glm/mat3x3.hpp>
 /*[ignore end]*/
 /*[export module ams.spatial.Matrix3]*/
 /*[import <concepts>]*/
@@ -253,6 +254,16 @@ public:
   [[nodiscard]] constexpr Vec3<decimal_t> col(int i) const {
     return {m[0][i], m[1][i], m[2][i]};
   }
+  
+  // implicit conversion to glm::mat3
+  constexpr operator glm::mat3() const {
+    // transpose
+    return glm::mat3(
+      m[0][0], m[1][0], m[2][0],
+      m[0][1], m[1][1], m[2][1],
+      m[0][2], m[1][2], m[2][2]
+    );
+  }
 
   /**
    * @brief transposes the matrix in place
@@ -447,6 +458,22 @@ public:
     decimal_t y = atan2(-m[0][2], sqrt(m[1][2] * m[1][2] + m[2][2] * m[2][2]));
     decimal_t z = atan2(m[0][1], m[0][0]);
     return {x, y, z};
+  }
+  
+  constexpr Matrix3 lookat(const Vec3 <decimal_t>& eye, const Vec3 <decimal_t>& center, const Vec3 <decimal_t>& up) {
+    Vec3 <decimal_t> f = normalize((center - eye));
+    Vec3 <decimal_t> s = normalize(cross(f, up));
+    Vec3 <decimal_t> u = cross(s, f);
+    m[0][0] = s.x;
+    m[0][1] = s.y;
+    m[0][2] = s.z;
+    m[1][0] = u.x;
+    m[1][1] = u.y;
+    m[1][2] = u.z;
+    m[2][0] = -f.x;
+    m[2][1] = -f.y;
+    m[2][2] = -f.z;
+    return *this;
   }
   
   /**

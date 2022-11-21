@@ -23,6 +23,7 @@
 /*[exclude end]*/
 /*[ignore begin]*/
 #include "ams_spatial_export.hpp"
+#include <glm/mat4x4.hpp>
 /*[ignore end]*/
 /*[export module ams.spatial.Matrix4]*/
 /*[import <concepts>]*/
@@ -267,6 +268,15 @@ public:
   constexpr void transpose();
 
   [[nodiscard]] constexpr Matrix4 transposed() const;
+
+  // implicit conversion to glm::mat4
+  constexpr operator glm::mat4() const {
+    // transpose
+    return glm::mat4(m[0][0], m[1][0], m[2][0], m[3][0],
+                     m[0][1], m[1][1], m[2][1], m[3][1],
+                     m[0][2], m[1][2], m[2][2], m[3][2],
+                     m[0][3], m[1][3], m[2][3], m[3][3]);
+  }
 
   [[nodiscard]] constexpr decimal_t determinant() const;
 
@@ -514,6 +524,49 @@ public:
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1};
+  }
+
+  /**
+   * @brief Sets the matrix to a given perspective
+   * @param fov - field of view in radians
+   * @param aspect - aspect ratio width / height
+   * @param near - near plane
+   * @param far - far plane
+   */
+  constexpr void setPerspective(decimal_t fov, decimal_t aspect, decimal_t near, decimal_t far) {
+    decimal_t f = safe_div(1, tan(fov / 2));
+    decimal_t nf = safe_div(1, near - far);
+    m[0][0] = safe_div(f, aspect);
+    m[0][1] = 0;
+    m[0][2] = 0;
+    m[0][3] = 0;
+    m[1][0] = 0;
+    m[1][1] = f;
+    m[1][2] = 0;
+    m[1][3] = 0;
+    m[2][0] = 0;
+    m[2][1] = 0;
+    m[2][2] = (far + near) * nf;
+    m[2][3] = -1;
+    m[3][0] = 0;
+    m[3][1] = 0;
+    m[3][2] = 2 * far * near * nf;
+    m[3][3] = 0;
+  }
+  
+  /**
+   * @brief Extracts a perspective from the matrix
+   * @param m - the matrix
+   * @param fov - field of view in radians
+   * @param aspect - aspect ratio width / height
+   * @param near - near plane
+   * @param far - far plane
+   */
+  constexpr static void extractPerspective(const Matrix4& m, decimal_t& fov, decimal_t& aspect, decimal_t& near, decimal_t& far) {
+    fov = atan(safe_div(1, m[0][0])) * 2;
+    aspect = safe_div(m[0][0], m[1][1]);
+    near = safe_div(m[3][2], m[2][2] - 1);
+    far = safe_div(m[3][2], m[2][2] + 1);
   }
 
   friend Matrix2;

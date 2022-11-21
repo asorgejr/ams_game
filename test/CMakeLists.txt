@@ -1,4 +1,3 @@
-option(TEST_OLC_PIXEL_GAME_ENGINE "Build the tests for the olcPixelGameEngine" OFF)
 
 include(FetchContent)
 include(GoogleTest)
@@ -35,6 +34,7 @@ function(add_test_module)
   gtest_discover_tests(${TEST_NAME})
   if (WIN32)
     target_compile_options(${TEST_NAME} PRIVATE /Zp8)
+    target_compile_definitions(${TEST_NAME} PRIVATE __cpp_consteval) # TODO: Hack for CLion which erroneously reads this as undefined.
   endif()
 endfunction()
 

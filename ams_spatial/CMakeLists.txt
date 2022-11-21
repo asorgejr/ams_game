@@ -1,11 +1,12 @@
 set(COMPONENT_NAME spatial)
 
+find_package(glm CONFIG REQUIRED)
 #add_subdirectory(third_party)
 
 file(GLOB_RECURSE ${COMPONENT_NAME}_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
-if (ENABLE_MODULES)
+if (AMS_ENABLE_MODULES)
   file(GLOB_RECURSE ${COMPONENT_NAME}_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/modules/ams/*.cppm
   )
@@ -25,7 +26,7 @@ set_target_properties(${COMPONENT_NAME}
     LINKER_LANGUAGE CXX
     VERSION ${${PROJECT_NAME}_VERSION}
 )
-if(ENABLE_MODULES)
+if(AMS_ENABLE_MODULES)
   set(MODULES_LIST " ")
   files_to_interface(VAR MODULES_LIST
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/modules
@@ -70,6 +71,7 @@ add_dependencies(spatial ams::core)
 target_link_libraries(${COMPONENT_NAME}
   PUBLIC
     core
+    glm::glm
     #Eigen3::Eigen
 )
 target_link_options(${COMPONENT_NAME}
