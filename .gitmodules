@@ -1,5 +1,5 @@
-[submodule "third_party/glfw"]
-	path = third_party/glfw
+[submodule "ams_game/third_party/glfw"]
+	path = ams_game/third_party/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "ams_core/third_party/gcem"]
 	path = ams_core/third_party/gcem

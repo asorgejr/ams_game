@@ -6,10 +6,8 @@
 #include <chrono>
 
 #ifndef AMS_MODULES
-
 #include <ams/Math.hpp>
 #include <cmath>
-
 #else
 import ams.Math;
 import <cmath>;

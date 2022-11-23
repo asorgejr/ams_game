@@ -1,7 +1,6 @@
 set(COMPONENT_NAME spatial)
 
 find_package(glm CONFIG REQUIRED)
-#add_subdirectory(third_party)
 
 file(GLOB_RECURSE ${COMPONENT_NAME}_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp

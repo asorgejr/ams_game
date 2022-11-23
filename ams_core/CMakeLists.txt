@@ -1,9 +1,9 @@
 set(COMPONENT_NAME core)
 
+#find_package(gcem CONFIG REQUIRED)
 if(AMS_ENABLE_BOOST)
 find_package(Boost 1.75 REQUIRED)
 endif()
-
 add_subdirectory(third_party)
 
 file(GLOB_RECURSE ${COMPONENT_NAME}_SOURCES
