@@ -642,6 +642,10 @@ lint/tmp/
 # extra build dirs
 cmake-build*/
 
+
+# glfw submodule
+ams_game/third_party/glfw
+
 # testing resources
 test/resources
 test/game/resources
