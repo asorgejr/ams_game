@@ -39,6 +39,7 @@
 # /*[exclude end]*/ -- everything in an exclude block is removed
 # /*[ignore begin]*/ -- everything in an ignore block is left as-is
 # /*[ignore end]*/ -- everything in an ignore block is left as-is
+# /*[[ ... ]]*/ -- everything in a double bracket block is copied as-is
 
 import os
 import re
@@ -54,9 +55,11 @@ bb = '['  # begin block
 eb = ']'  # end block
 bb_expr = '\\' + bb
 eb_expr = '\\' + eb
-tb_expr = bc_expr + bb_expr  # /*[
+tb_expr = bc_expr + bb_expr + r'(?!\*\/)'  # /*[  and checks that the expression is not immediately escaped
 te_expr = eb_expr + ec_expr  # ]*/
-tag_pad_size = 3  # /*[  and  ]*/
+tb_raw = bc + bb  # /*[
+te_raw = eb + ec  # ]*/
+tag_pad_size = 3  # /*[ == 3  and  ]*/ == 3
 
 tb_rgx = re.compile(tb_expr)
 te_rgx = re.compile(te_expr)
@@ -76,7 +79,9 @@ class ModifiedText:
         """A stack of all changes made to the text"""
         self._ignore_blocks: List[Tuple[int, int]] = []
         """A list of tuples containing the start and end indices of all ignore blocks. Indices are correlative to the original text"""
-        self._find_ignore_blocks()
+        self._find_ignored_blocks()
+        self._remove_ignore_block_tags()
+        self._remove_block_tags()
 
     def __str__(self):
         return self._change_stack[0]
@@ -107,34 +112,90 @@ class ModifiedText:
         """Returns the number of changes made to the text"""
         return len(self._change_stack) - 1
 
-    def _find_ignore_blocks(self):
-        """Finds all ignore blocks in the text, removing the tags from the text and storing the start and end indices of the blocks"""
-        ibtag = '/*[ignore begin]*/'
-        ietag = '/*[ignore end]*/'
+    def _find_ignored_blocks(self):
+        """Finds all ignore blocks in the text"""
+        ibtag = re.compile(tb_expr + r'\s*ignore begin\s*' + te_expr)
+        ietag = re.compile(tb_expr + r'\s*ignore end\s*' + te_expr)
         self._ignore_blocks = []
+        txt = self._original
+        startpos = 0
+        while True:
+            start = ibtag.search(txt, startpos)
+            if not start: break
+            startpos = start.start()
+            end = ietag.search(txt, startpos)
+            if not end: break
+            endpos = end.start()
+            bstartpos = startpos if startpos == 0 or txt[startpos-1] != '\n' else startpos - 1
+            estartpos = endpos if endpos == 0 or txt[endpos-1] != '\n' else endpos - 1
+            self._ignore_blocks.append((bstartpos, estartpos - len(start.group())))
+            startpos = endpos - (len(start.group())) - (len(end.group()))
+        btag = re.compile(tb_expr + bb_expr + r'((.(?<!\*/))*)' + eb_expr + te_expr, re.DOTALL)
+        bbsize = len(tb_raw + bb)
+        ebsize = len(eb + te_raw)
+        startpos = 0
+        while True:
+            start = btag.search(txt, startpos)
+            if not start: break
+            startpos = start.start()
+            endpos = startpos + len(start.group())
+            bstartpos = startpos  # if startpos == 0 or txt[startpos-1] != '\n' else startpos - 1
+            estartpos = endpos - ebsize
+            self._ignore_blocks.append((self.offset() + bstartpos, self.offset() + (estartpos - bbsize)))
+            startpos = endpos - (bbsize + ebsize)
+
+    def _remove_ignore_block_tags(self):
+        """Finds all ignore blocks in the text, removing the tags from the text and storing the start and end indices of the blocks"""
+        ibtag = re.compile(tb_expr + r'\s*ignore begin\s*' + te_expr)
+        ietag = re.compile(tb_expr + r'\s*ignore end\s*' + te_expr)
         result = self._original
         offset = 0
-        start = 0
+        startpos = 0
         while True:
             size = len(result)
-            start = result.find(ibtag, start)
-            if start == -1: break
-            end = result.find(ietag, start)
-            if end == -1: break
-            bstartpos = start if start == 0 or result[start-1] != '\n' else start - 1
-            estartpos = end if end == 0 or result[end-1] != '\n' else end - 1
-            self._ignore_blocks.append((bstartpos + offset, estartpos - len(ibtag) + offset))
+            start = ibtag.search(result, startpos)
+            if not start: break
+            startpos = start.start()
+            end = ietag.search(result, startpos)
+            if not end: break
+            endpos = end.start()
+            bstartpos = startpos if startpos == 0 or result[startpos-1] != '\n' else startpos - 1
+            estartpos = endpos if endpos == 0 or result[endpos-1] != '\n' else endpos - 1
             result = '{0}{1}{2}'.format(result[:bstartpos],
-                                        result[bstartpos + len(ibtag)+1:estartpos],
-                                        result[estartpos + len(ietag)+1:])
+                                        result[bstartpos + len(start.group())+1:estartpos],
+                                        result[estartpos + len(end.group())+1:])
             offset += len(result) - size
-            start = end - (len(ibtag)) - (len(ietag))
+            startpos = endpos - (len(start.group())) - (len(end.group()))
         self.set(result)
+
+    def _remove_block_tags(self):
+        """Finds all block tags in the text, removing the tags from the text and storing the start and end indices of the blocks"""
+        btag = re.compile(tb_expr + bb_expr + r'((.(?<!\*/))*)' + eb_expr + te_expr, re.DOTALL)
+        result = self._change_stack[0]
+        bbsize = len(tb_raw + bb)
+        ebsize = len(eb + te_raw)
+        offset = 0
+        startpos = 0
+        while True:
+            size = len(result)
+            start = btag.search(result, startpos)
+            if not start: break
+            startpos = start.start()
+            endpos = startpos + len(start.group())
+            bstartpos = startpos  # if startpos == 0 or result[startpos-1] != '\n' else startpos - 1
+            estartpos = endpos - ebsize
+            result = '{0}{1}{2}'.format(result[:bstartpos],
+                                        result[bstartpos + bbsize:estartpos],
+                                        result[endpos:])
+            offset += len(result) - size
+            startpos = endpos - (bbsize + ebsize)
+        self.set(result)
+
 
     def is_ignored(self, index: int, s: str) -> bool:
         """Returns whether the given index is in an ignore block"""
         if not self._ignore_blocks or len(self._ignore_blocks) == 0:
-            self._find_ignore_blocks()
+            self._remove_ignore_block_tags()
         for start, end in self._ignore_blocks:
             # ofst = len(self._change_stack[1]) - len(self._original)
             # todo: inefficient and prone to false-positives in cases where there is code duplication
@@ -143,6 +204,7 @@ class ModifiedText:
                 if found != -1 and start <= found - (len(change) - len(self._original)) < end:
                     return True
         return False
+
 
 
 def unwrap_tag(tag: str) -> str:
@@ -172,6 +234,31 @@ def exclude_block(contents: ModifiedText) -> ModifiedText:
         if begin is None:
             return ret
         end = exclude_end_tag.search(ret.text(), begin.end())
+    return ret
+
+
+double_bracket_block = re.compile(tb_expr + bb_expr + r'(.*?)' + eb_expr + te_expr, re.MULTILINE)  # /*[[ ... ]]*/
+def double_bracket_block_include(contents: ModifiedText) -> ModifiedText:
+    ret = contents
+    # find location of begin strip block
+    begin = double_bracket_block.search(ret.text())
+    if begin is None:
+        return ret
+    # find location of paired end strip block
+    end = double_bracket_block.search(ret.text(), begin.end())
+    if end is None:
+        return ret
+    # remove each exclude block
+    while begin is not None and end is not None:
+        # remove the block and newline
+        if begin.start() > 0 and ret.text()[begin.start() - 1] == '\n':
+            ret.set(ret.text()[:begin.start() - 1] + ret.text()[end.end():])
+        else:
+            ret.set(ret.text()[:begin.start()] + ret.text()[end.end():])
+        begin = double_bracket_block.search(ret.text())
+        if begin is None:
+            return ret
+        end = double_bracket_block.search(ret.text(), begin.end())
     return ret
 
 

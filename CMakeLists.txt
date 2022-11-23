@@ -8,16 +8,18 @@
 option(AMS_BUILD_TESTS "Build tests" OFF)
 option(AMS_ENABLE_MODULES "c++20+ Module Library" OFF)
 option(AMS_EXCEPTIONS "Enable exceptions" ON)
-option(AMS_NEGATIVE_INDEXING "Enable negative indexing" OFF)
+option(AMS_NEGATIVE_INDEXING "Enable negative indexing for ams container types" OFF)
 option(AMS_ENABLE_BOOST "Enable Boost" OFF)
 
 cmake_minimum_required(VERSION 3.16)
 project(ams
-  LANGUAGES C CXX
+  LANGUAGES CXX
   VERSION 0.1
 )
 
-set(CMAKE_CXX_STANDARD 20)
+if (NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 20)
+endif()
 if(CMAKE_CXX_STANDARD LESS 20)
   message(FATAL_ERROR "C++20 or greater is required")
 endif()
@@ -29,10 +31,11 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
 include(cmake/Utils.cmake)
+include(cmake/ModulePlatformCheck.cmake)
 
 if (AMS_BUILD_TESTS)
-#    set(CMAKE_CXX_EXTENSIONS OFF)
-#    enable_testing()
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    enable_testing()
 endif()
 
 
@@ -40,12 +43,18 @@ if (AMS_EXCEPTIONS)
   add_compile_definitions(AMS_EXCEPTIONS)
 endif()
 
-if (AMS_ENABLE_MODULES AND NOT MSVC AND CMAKE_VERSION VERSION_LESS 3.23)
-    message(WARNING
-"MSVC is currently the only compiler with robust support for building modules using older versions of cmake.
-Please upgrade to cmake 3.23 or newer to use modules.
-Ignoring AMS_ENABLE_MODULES option.")
-    set(AMS_ENABLE_MODULES OFF)
+check_compiler_can_compile_modules(_modules_supported)
+
+if (AMS_ENABLE_MODULES AND _modules_supported)
+  # enable cmake experimental features
+  set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "3c375311-a3c9-4396-a187-3227ef642046")
+  if(GNU)
+    include(gcc_modules.cmake)
+  endif()
+  message(STATUS "${PROJECT_NAME}: C++ Modules enabled")
+  if (CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+    add_compile_definitions(AMS_MODULES_STD)
+  endif()
 endif()
 
 if(AMS_ENABLE_MODULES)
@@ -58,7 +67,8 @@ set(AMS_OS "Unknown")
 set(AMS_OS_VERSION 0)
 set(AMS_COMPILER "Unknown")
 set(AMS_COMPILER_VERSION 0)
-set(AMS_ARCH "Unknown")
+set(AMS_0S_ARCH "Unknown")
+set(AMS_TARGET_ARCH "Unknown")
 set(AMS_CPU_CORES 1)
 set(AMS_LIBRARY_VERSION ${PROJECT_VERSION})
 
@@ -67,7 +77,8 @@ system_discovery(UPPERCASE
   OS_VERSION AMS_OS_VERSION
   COMPILER AMS_COMPILER
   COMPILER_VERSION AMS_COMPILER_VERSION
-  ARCH AMS_ARCH
+  OS_ARCH AMS_0S_ARCH
+  TARGET_ARCH AMS_TARGET_ARCH
   CPU_CORES AMS_CPU_CORES
 )
 # convert AMS_CPU_CORES to number
@@ -75,10 +86,13 @@ string(REGEX REPLACE "[^0-9]" "" AMS_CPU_CORES "${AMS_CPU_CORES}")
 
 message("Configuration:
 OS: ${AMS_OS} ${AMS_OS_VERSION}
+Generator: ${CMAKE_GENERATOR}
 Compiler: ${AMS_COMPILER} ${AMS_COMPILER_VERSION}
-Architecture: ${AMS_ARCH}
+System Architecture: ${AMS_0S_ARCH}
+Target Architecture: ${AMS_TARGET_ARCH}
 CPU Cores: ${AMS_CPU_CORES}
-Library Version: ${AMS_LIBRARY_VERSION}"
+Library Version: ${AMS_LIBRARY_VERSION}
+C++ Standard: ${CMAKE_CXX_STANDARD}"
 )
 
 # control where the static and shared libraries are built so that on windows
