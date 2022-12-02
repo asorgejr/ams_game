@@ -16,11 +16,8 @@
  */
 
 #include <gtest/gtest.h>
-#ifndef AMS_MODULES
-#include <ams/StringExtensions.hpp>
-#else
-import ams.StringExtensions;
-#endif
+
+import ams;
 
 using namespace ams;
 using namespace std;

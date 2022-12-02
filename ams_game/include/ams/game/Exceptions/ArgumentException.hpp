@@ -14,23 +14,15 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-// This file uses metatags to convert headers to module-interfaces using header2module.py.
-// Any block comment formatted as: /*[   ]*/ is a metatag and other code may depend on it.
-// Proceed with caution when modifying such comments.
-
-/*[exclude begin]*/
-#pragma once
-/*[exclude end]*/
-/*[export module ams.game.ArgumentException]*/
-/*[exclude begin]*/
-#include "Exception.hpp"
-/*[exclude end]*/
-/*[import ams.game.Exception]*/
 
 
-/*[export]*/ namespace ams {
+export module ams.game.ArgumentException;
+import ams;
 
-class ArgumentException : public Exception {
+
+namespace ams {
+
+export class ArgumentException : public Exception {
 public:
   using Exception::Exception;
 };

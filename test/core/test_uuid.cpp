@@ -17,11 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#ifndef AMS_MODULES
-#include <ams/Uuid.hpp>
-#else
-import ams.Uuid;
-#endif
+import ams;
 
 TEST(uuid, uuid) {
   ams::Uuid uuid;

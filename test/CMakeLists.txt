@@ -16,6 +16,8 @@ endif()
 FetchContent_MakeAvailable(googletest)
 add_library(GTest::GTest INTERFACE IMPORTED)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
+# IDE Configuration
+set_property(TARGET gtest gtest_main gmock gmock_main PROPERTY FOLDER "External")
 
 
 # CREATE A TEST MODULE
@@ -33,9 +35,10 @@ function(add_test_module)
   endif()
   gtest_discover_tests(${TEST_NAME})
   if (WIN32)
-    target_compile_options(${TEST_NAME} PRIVATE /Zp8)
-    target_compile_definitions(${TEST_NAME} PRIVATE __cpp_consteval) # TODO: Hack for CLion which erroneously reads this as undefined.
+#   target_compile_options(${TEST_NAME} PRIVATE /Zp8)
   endif()
+  # IDE Configuration
+  set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "Tests")
 endfunction()
 
 add_subdirectory(core)

@@ -1,0 +1,128 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  /*"include": [],*/
+  "configurePresets": [
+    {
+      "name": "default-release",
+      "displayName": "Default Config Release",
+      "generator": "Ninja",
+      "cmakeExecutable": "cmake.exe",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "$penv{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}
+    },
+    {
+      "name": "default-debug",
+      "displayName": "Default Config Debug",
+      "inherits": "default-release",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {"CMAKE_BUILD_TYPE": "Debug"}
+    },
+    {
+      "name": "default-debug-testing",
+      "displayName": "Default Config Testing",
+      "inherits": "default-debug",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "AMS_BUILD_TESTS": "ON",
+        "CMAKE_MESSAGE_LOG_LEVEL": "DEBUG"
+      }
+    },
+    {
+      "name": "msvc-x64-release",
+      "displayName": "MSVC x64 Release",
+      "description": "Configure for Windows using MSVC",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "generator": "Visual Studio 17 2022",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cmakeExecutable": "cmake.exe",
+      "toolchainFile": "$penv{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {}
+    },
+    {
+      "name": "msvc-x64-debug",
+      "displayName": "MSVC x64 Debug",
+      "inherits": "msvc-x64-release",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "msvc-x64-debug-test",
+      "displayName": "MSVC x64 Debug Testing",
+      "inherits": "msvc-x64-debug",
+      "cacheVariables": {
+        "AMS_BUILD_TESTS": "ON",
+        "CMAKE_MESSAGE_LOG_LEVEL": "DEBUG"
+      }
+    },
+    {
+      "name": "msvc-x64-release-test",
+      "displayName": "MSVC x64 Release Testing",
+      "inherits": "msvc-x64-debug-test",
+      "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "displayName": "Default Build",
+      "configurePreset": "default-debug",
+      "hidden": false
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default-debug",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      }
+    }
+  ],
+  "vendor": {
+    "microsoft.com/VisualStudioSettings/CMake/1.0": {
+      "hostOS": [
+        "Windows"
+      ],
+      "preferredGenerators": {
+        "Visual Studio 17 2022": {
+          "platforms": [
+            "x64"
+          ]
+        }
+      },
+      "intelliSenseMode": "msvc-x64",
+      "intelliSenseOptions": {
+        "additionalCompilerArgs": [
+          "/I",
+          "${binaryDir}/ams_core/include",
+          "/I",
+          "${binaryDir}/ams_spatial/include"
+        ]
+      }
+    }
+  }
+}

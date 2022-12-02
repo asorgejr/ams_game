@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33103.201
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ams_game", "ams_game\ams_game.vcxproj", "{90D09540-81EF-4B93-B720-011606466AFF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE} = {2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ams_spatial", "ams_spatial\ams_spatial.vcxproj", "{2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B626E7CC-5F18-4847-A447-61E646CCF58D} = {B626E7CC-5F18-4847-A447-61E646CCF58D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ams_core", "ams_core\ams_core.vcxproj", "{B626E7CC-5F18-4847-A447-61E646CCF58D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_core", "test_core\test_core.vcxproj", "{016D9418-666B-4E24-B8D1-E54E7F05E68E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libams", "libams", "{1E26E714-B3B1-4120-8B0B-A15A0E42DD63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{24CF6EA9-F35F-44DB-9049-4BB00860A727}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C397BD0A-8A0C-4794-9A8E-13E816318380}"
+	ProjectSection(SolutionItems) = preProject
+		vcpkg.json = vcpkg.json
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90D09540-81EF-4B93-B720-011606466AFF}.Debug|x64.ActiveCfg = Debug|x64
+		{90D09540-81EF-4B93-B720-011606466AFF}.Debug|x64.Build.0 = Debug|x64
+		{90D09540-81EF-4B93-B720-011606466AFF}.Release|x64.ActiveCfg = Release|x64
+		{90D09540-81EF-4B93-B720-011606466AFF}.Release|x64.Build.0 = Release|x64
+		{2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE}.Debug|x64.ActiveCfg = Debug|x64
+		{2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE}.Debug|x64.Build.0 = Debug|x64
+		{2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE}.Release|x64.ActiveCfg = Release|x64
+		{2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE}.Release|x64.Build.0 = Release|x64
+		{B626E7CC-5F18-4847-A447-61E646CCF58D}.Debug|x64.ActiveCfg = Debug|x64
+		{B626E7CC-5F18-4847-A447-61E646CCF58D}.Debug|x64.Build.0 = Debug|x64
+		{B626E7CC-5F18-4847-A447-61E646CCF58D}.Release|x64.ActiveCfg = Release|x64
+		{B626E7CC-5F18-4847-A447-61E646CCF58D}.Release|x64.Build.0 = Release|x64
+		{016D9418-666B-4E24-B8D1-E54E7F05E68E}.Debug|x64.ActiveCfg = Debug|x64
+		{016D9418-666B-4E24-B8D1-E54E7F05E68E}.Debug|x64.Build.0 = Debug|x64
+		{016D9418-666B-4E24-B8D1-E54E7F05E68E}.Release|x64.ActiveCfg = Release|x64
+		{016D9418-666B-4E24-B8D1-E54E7F05E68E}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{90D09540-81EF-4B93-B720-011606466AFF} = {1E26E714-B3B1-4120-8B0B-A15A0E42DD63}
+		{2FACFF9B-8CB7-4894-AC02-C9F46FE23CFE} = {1E26E714-B3B1-4120-8B0B-A15A0E42DD63}
+		{B626E7CC-5F18-4847-A447-61E646CCF58D} = {1E26E714-B3B1-4120-8B0B-A15A0E42DD63}
+		{016D9418-666B-4E24-B8D1-E54E7F05E68E} = {24CF6EA9-F35F-44DB-9049-4BB00860A727}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {88A7D7AA-44C6-4B7F-9F3B-6E8DA7543FFB}
+	EndGlobalSection
+EndGlobal

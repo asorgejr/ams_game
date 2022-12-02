@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{90D09540-81EF-4B93-B720-011606466AFF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ams</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    <IntermediateOutputPath>path</IntermediateOutputPath>
+    <ProjectName>ams_game</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PublicModuleDirectories>$(SolutionDir)..\$(ProjectName)\public\;$(SolutionDir)..\$(ProjectName)\include\;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicIncludeDirectories>$(SolutionDir)..\$(ProjectName)\include\;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <TargetName>game</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <PublicModuleDirectories>$(SolutionDir)..\$(ProjectName)\public\;$(SolutionDir)..\$(ProjectName)\include\;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicIncludeDirectories>$(SolutionDir)..\$(ProjectName)\include\;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <TargetName>game</TargetName>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\$(ProjectName)\include\;$(SolutionDir)..\build\msvc-x64-debug-test\$(ProjectName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <PreprocessorDefinitions>$(TargetName)_EXPORTS;_WINDOWS;_USRDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <PrecompiledHeaderFile />
+      <TranslateIncludes>true</TranslateIncludes>
+    </ClCompile>
+    <Link>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\$(ProjectName)\include\;$(SolutionDir)..\build\msvc-x64-debug-test\$(ProjectName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <PreprocessorDefinitions>$(TargetName)_EXPORTS;_WINDOWS;_USRDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <PrecompiledHeaderFile />
+      <TranslateIncludes>true</TranslateIncludes>
+    </ClCompile>
+    <Link>
+      <EnableUAC>false</EnableUAC>
+      <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Application.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\ApplicationInfo.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Behavior.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Camera.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Component.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\components\MeshComponent.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\config.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Display.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Entity.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Exceptions.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\ArgumentException.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\Exception.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\LoggerException.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\NullPointerException.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\ActiveComponent.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\CallbackList.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\Meshes.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\RendererBackend.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\RendererOpenGL.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\RendererVulkan.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\ISerializable.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Key.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Logger.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Mesh.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\MeshComponent.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\MeshLoaders.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\AMSMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\BlendMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\CommonLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\FBXMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\GLBMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\GLTFMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\ObjMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\PlyMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Mouse.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Object.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Platform.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Renderer.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Scene.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\SystemInfo.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Transform.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Util.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Window.cppm" />
+    <ClCompile Include="..\..\ams_game\src\game\Application.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Behavior.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Camera.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Component.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\components\MeshComponent.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Display.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Entity.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\internal\ActiveComponent.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\internal\Meshes.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\internal\RendererOpenGL.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\internal\RendererVulkan.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Logger.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Mesh.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\AMSMeshLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\BlendMeshLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\CommonLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\FBXMeshLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\GLBMeshLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\GLTFMeshLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\ObjMeshLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\PlyMeshLoader.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Platform.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Renderer.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Scene.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\SystemInfo.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Transform.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Util.cpp" />
+    <ClCompile Include="..\..\ams_game\src\game\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\ams_game\include\ams\ams_game_export.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Application.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\ApplicationInfo.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Behavior.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Camera.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Component.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\components\MeshComponent.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\config.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Display.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Entity.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Exceptions.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\ArgumentException.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\Exception.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\LoggerException.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\NullPointerException.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\ActiveComponent.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\CallbackList.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\Meshes.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\RendererBackend.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\RendererOpenGL.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\RendererVulkan.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Key.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Logger.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Mesh.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\MeshLoaders.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\AMSMeshLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\BlendMeshLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\CommonLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\FBXMeshLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\GLBMeshLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\GLTFMeshLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\ObjMeshLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\PlyMeshLoader.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Mouse.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Object.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Renderer.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Scene.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\SystemInfo.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Transform.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Util.hpp" />
+    <ClInclude Include="..\..\ams_game\include\ams\game\Window.hpp" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ams_game.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

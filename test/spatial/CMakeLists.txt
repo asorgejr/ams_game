@@ -11,11 +11,12 @@ add_test_module(NAME test_spatial
     ${spatial_INCLUDE_DIR}
 )
 
-add_executable(testv_spatial testv_matrix.cpp)
-target_link_libraries(testv_spatial PRIVATE
-  ams::core
-  ams::spatial
-)
+
+add_test_module(NAME testv_spatial
+  SOURCES testv_matrix.cpp
+  DEPENDENCIES ams::spatial
+  INCLUDE_DIRS ${spatial_INCLUDE_DIR})
+
 
 #target_link_options(test_spatial PRIVATE
 #  "$<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>"

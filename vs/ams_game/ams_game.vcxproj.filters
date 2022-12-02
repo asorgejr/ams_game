@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Application.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\ApplicationInfo.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Behavior.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Camera.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Component.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\components\MeshComponent.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\config.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Display.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Entity.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Exceptions.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\ArgumentException.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\Exception.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\LoggerException.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\exceptions\NullPointerException.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\ActiveComponent.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\CallbackList.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\Meshes.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\RendererBackend.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\RendererOpenGL.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\internal\RendererVulkan.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\ISerializable.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Key.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Logger.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Mesh.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\MeshComponent.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\MeshLoaders.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\AMSMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\BlendMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\CommonLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\FBXMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\GLBMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\GLTFMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\ObjMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\meshloaders\PlyMeshLoader.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Mouse.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Object.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Platform.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Renderer.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Scene.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\SystemInfo.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Transform.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Util.cppm" />
+    <ClCompile Include="..\..\ams_game\include\modules\ams\game\Window.cppm" />
+    <ClCompile Include="..\..\ams_game\src\game\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Behavior.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\components\MeshComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Display.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\internal\ActiveComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\internal\Meshes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\internal\RendererOpenGL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\internal\RendererVulkan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\AMSMeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\BlendMeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\CommonLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\FBXMeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\GLBMeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\GLTFMeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\ObjMeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\meshloaders\PlyMeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\SystemInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ams_game\src\game\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\ams_game_export.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Application.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\ApplicationInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Behavior.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Camera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Component.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\components\MeshComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Display.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Exceptions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\ArgumentException.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\Exception.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\LoggerException.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\exceptions\NullPointerException.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\ActiveComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\CallbackList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\Meshes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\RendererBackend.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\RendererOpenGL.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\internal\RendererVulkan.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Key.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Logger.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\MeshLoaders.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\AMSMeshLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\BlendMeshLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\CommonLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\FBXMeshLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\GLBMeshLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\GLTFMeshLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\ObjMeshLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\meshloaders\PlyMeshLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Mouse.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Object.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Renderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\SystemInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Transform.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ams_game\include\ams\game\Window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ams_game.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

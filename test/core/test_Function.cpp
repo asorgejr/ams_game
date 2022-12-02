@@ -17,11 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#ifndef AMS_MODULES
-#include <ams/Function.hpp>
-#else
-import ams.Function;
-#endif
+import ams;
+
 
 TEST(Function, DefaultConstructor) {
   ams::Function<void> f;

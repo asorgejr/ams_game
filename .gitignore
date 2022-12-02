@@ -642,6 +642,13 @@ lint/tmp/
 # extra build dirs
 cmake-build*/
 
+# vs intermediate
+intermediate/
+vs/intermediate/
+
+# local shell utils dir
+shell/
+
 
 # glfw submodule
 ams_game/third_party/glfw
@@ -649,3 +656,6 @@ ams_game/third_party/glfw
 # testing resources
 test/resources
 test/game/resources
+
+# vs cmake settings
+CMakeSettings.json

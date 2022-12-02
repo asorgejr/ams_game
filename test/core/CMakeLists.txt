@@ -2,6 +2,7 @@
 add_test_module(NAME test_core
   SOURCES
     test_Array.cpp
+    test_Exception.cpp
     test_Function.cpp
     test_Math.cpp
     test_List.cpp

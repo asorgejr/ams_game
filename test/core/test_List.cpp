@@ -17,13 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#ifndef AMS_MODULES
-#include <ams/List.hpp>
-#include <ams/config.hpp>
-#else
-import ams.List;
-import ams.config;
-#endif
+import ams;
 
 using std::cout;
 using std::endl;

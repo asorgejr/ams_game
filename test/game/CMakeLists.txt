@@ -1,25 +1,25 @@
 add_test_module(NAME test_game
   SOURCES
-  test_ApplicationAndScene.cpp
-  test_ComponentAndEntity.cpp
+    test_ApplicationAndScene.cpp
+    test_ComponentAndEntity.cpp
     test_GameUtil.cpp
   DEPENDENCIES ams::game
   INCLUDE_DIRS
-  ${game_INCLUDE_DIR}
-  "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-  "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
-  "$<INSTALL_INTERFACE:include>"
+    ${game_INCLUDE_DIR}
+    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
+    "$<INSTALL_INTERFACE:include>"
 )
 
 add_test_module(NAME test_Mesh
   SOURCES
-  test_Mesh.cpp
-  DEPENDENCIES ams::game
+    test_Mesh.cpp
+    DEPENDENCIES ams::game
   INCLUDE_DIRS
-  ${game_INCLUDE_DIR}
-  "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-  "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
-  "$<INSTALL_INTERFACE:include>"
+    ${game_INCLUDE_DIR}
+    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
+    "$<INSTALL_INTERFACE:include>"
 )
 
 target_compile_definitions(test_Mesh PRIVATE
@@ -31,44 +31,36 @@ add_test_module(NAME test_Window
     test_Window.cpp
   DEPENDENCIES ams::game
   INCLUDE_DIRS
-  ${game_INCLUDE_DIR}
-  "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-  "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
-  "$<INSTALL_INTERFACE:include>"
+    ${game_INCLUDE_DIR}
+    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
+    "$<INSTALL_INTERFACE:include>"
 )
 
-add_test_module(NAME test_Exception
-  SOURCES
-    test_Exception.cpp
+
+add_test_module(NAME test_gfx
+  SOURCES test_gfx.cpp
   DEPENDENCIES ams::game
-  INCLUDE_DIRS
-  ${game_INCLUDE_DIR}
-  "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-  "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
-  "$<INSTALL_INTERFACE:include>"
-)
+  INCLUDE_DIRS ${game_INCLUDE_DIR})
 
 
-add_executable(test_gfx test_gfx.cpp)
-target_link_libraries(test_gfx PUBLIC ams::game)
-target_include_directories(test_gfx PUBLIC ${game_INCLUDE_DIR})
-
-add_executable(profile_Game profile_Game.cpp)
-target_link_libraries(profile_Game PRIVATE ams::game)
-target_include_directories(profile_Game PRIVATE ${game_INCLUDE_DIR})
+add_test_module(NAME profile_Game
+  SOURCES profile_Game.cpp
+  DEPENDENCIES ams::game
+  INCLUDE_DIRS ${game_INCLUDE_DIR})
 
 
 # no graphics debugging needed after this point
 remove_definitions(-DAMS_GRAPHICS_DEBUG)
 add_test_module(NAME test_Log
   SOURCES
-  test_Log.cpp
+    test_Log.cpp
   DEPENDENCIES ams::game
   INCLUDE_DIRS
-  ${game_INCLUDE_DIR}
-  "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-  "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
-  "$<INSTALL_INTERFACE:include>"
+    ${game_INCLUDE_DIR}
+    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${BUILD_INTERFACE_DIR}>"
+    "$<INSTALL_INTERFACE:include>"
   )
 
 

@@ -16,12 +16,9 @@
  */
 
 #include <gtest/gtest.h>
+#include <random>
 
-#ifndef AMS_MODULES
-#include <ams/Array.hpp>
-#else
 import ams;
-#endif
 
 using namespace ams;
 

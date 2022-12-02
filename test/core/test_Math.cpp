@@ -5,13 +5,7 @@
 #include <gtest/gtest.h>
 #include <chrono>
 
-#ifndef AMS_MODULES
-#include <ams/Math.hpp>
-#include <cmath>
-#else
-import ams.Math;
-import <cmath>;
-#endif
+import ams;
 
 // #define AMS_TEST_MATH_BENCHMARK
 
@@ -19,10 +13,10 @@ using namespace std::chrono;
 using hrclock = high_resolution_clock;
 
 // ams time / cmath time limit
-const float cm_ts = 1.4;
+const float cm_ts = 1.4f;
 
 // ams cexpr time / cmath time limit
-const float cm_cexpr_ts = 0.7;
+const float cm_cexpr_ts = 0.7f;
 
 TEST(Math, abs) {
   EXPECT_EQ(ams::abs(1), 1);

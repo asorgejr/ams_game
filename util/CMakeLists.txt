@@ -18,6 +18,11 @@ if (AMS_UTIL_DEBUG)
   target_compile_definitions(${UTIL_NAME} PRIVATE AMS_UTIL_DEBUG)
 endif()
 
+# IDE Configuration
+set_property(TARGET ${UTIL_NAME} PROPERTY FOLDER "Utils")
+
+
+
 set(UTIL_NAME meshpp)
 add_executable(${UTIL_NAME} ${UTIL_NAME}.cpp
   BoxComment.hpp)
@@ -34,3 +39,6 @@ target_include_directories(${UTIL_NAME}
 if (AMS_UTIL_DEBUG)
   target_compile_definitions(${UTIL_NAME} PRIVATE AMS_UTIL_DEBUG)
 endif()
+
+# IDE Configuration
+set_property(TARGET ${UTIL_NAME} PROPERTY FOLDER "Utils")
