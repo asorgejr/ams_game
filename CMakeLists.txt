@@ -34,13 +34,9 @@ include(cmake/Utils.cmake)
 include(cmake/ModulePlatformCheck.cmake)
 include(cmake/dict.cmake)
 
-dict(SET _test_dict)
-message("[test] SET return default_dict: '${_test_dict}'")
-dict(SET _test_dict KEY "test-key" VALUE "strval")
-message("[test] kvp str val: '${_test_dict}'")
-
-
-return()
+#include(cmake/test/test-dict.cmake)
+#run_dict_test()
+#return()
 
 if (AMS_BUILD_TESTS)
   set(CMAKE_CXX_EXTENSIONS OFF)

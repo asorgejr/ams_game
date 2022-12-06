@@ -28,12 +28,13 @@ import <algorithm>;
 import <stdexcept>;
 import <type_traits>;
 import <random>;
+import :config;
 namespace cexpr_math = gcem;
 #else
 import std;
 namespace cexpr_math = std;
 #endif
-import :config;
+
 
 
 /**
@@ -41,13 +42,13 @@ import :config;
  */
 export namespace ams {
 
-export template<typename TNum>
+template<typename TNum>
 concept NumericT = std::is_arithmetic_v<TNum>;
 
-export template<typename TNum>
+template<typename TNum>
 concept IntegralT = std::is_integral_v<TNum>;
 
-export template<typename TNum>
+template<typename TNum>
 concept DecimalT = std::is_floating_point_v<TNum>;
 
 /**

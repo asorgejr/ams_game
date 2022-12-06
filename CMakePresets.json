@@ -34,7 +34,7 @@
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
         "AMS_BUILD_TESTS": "ON",
-        "CMAKE_MESSAGE_LOG_LEVEL": "DEBUG"
+        "CMAKE_MESSAGE_LOG_LEVEL": "VERBOSE"
       }
     },
     {
